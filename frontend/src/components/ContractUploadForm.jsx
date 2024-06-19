@@ -4,7 +4,17 @@ import axios from "axios";
 const ContractUploadForm = () => {
   const [file, setFile] = useState(null);
   const [title, setTitle] = useState("");
+  const [numberOfContract, setNumberOfContracts] = useState(null);
   const [description, setDescription] = useState("");
+  const [date, setDate] = useState("");
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -12,8 +22,14 @@ const ContractUploadForm = () => {
   const handleTitleChange = (e) => {
     setTitle(e.target.value);
   };
+  const handleNumberChange = (e) => {
+    setNumberOfContracts(e.target.value);
+  };
   const handleDescriptionChange = (e) => {
     setDescription(e.target.value);
+  };
+  const handleDateChange = (e) => {
+    setDate(e.target.value);
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,7 +37,10 @@ const ContractUploadForm = () => {
 
     formData.append("file", file);
     formData.append("title", title);
+    formData.append("number", numberOfContract);
     formData.append("description", description);
+    formData.append("date", date);
+
     try {
       await axios.post("http://127.0.0.1:5000/api/contracts/add", formData, {
         headers: {
@@ -32,6 +51,8 @@ const ContractUploadForm = () => {
       setTitle("");
       setFile(null);
       setDescription("");
+      setDate("");
+      setNumberOfContracts(0);
     } catch (error) {
       alert("Error uploading contract");
       console.log(error);
@@ -72,6 +93,42 @@ const ContractUploadForm = () => {
             name="title"
             value={title}
             onChange={handleTitleChange}
+            required
+            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm 
+            focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          />
+        </div>
+        <div className="mb-4">
+          <label
+            htmlFor="numberOfContract"
+            className="block text-sm font-semibold text-gray-700"
+          >
+            Number
+          </label>
+          <input
+            type="number"
+            id="number"
+            name="number"
+            value={numberOfContract}
+            onChange={handleNumberChange}
+            required
+            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm 
+            focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          />
+        </div>
+        <div className="mb-4">
+          <label
+            htmlFor="numberOfContract"
+            className="block text-sm font-semibold text-gray-700"
+          >
+            Date
+          </label>
+          <input
+            type="date"
+            id="date"
+            name="date"
+            value={date}
+            onChange={handleDateChange}
             required
             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm 
             focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"

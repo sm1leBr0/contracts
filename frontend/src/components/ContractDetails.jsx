@@ -36,12 +36,22 @@ const ContractDetails = () => {
     }
   };
 
+  const deleteContract = async () => {
+    try {
+      await axios.delete(`http://localhost:5000/api/contracts/${id}`);
+    } catch (error) {
+      console.error("Error deleting contract:", error);
+    }
+  };
   if (!contract) return <div>Loading...</div>;
 
   return (
     <div>
+      <div></div>
+
       <h2>{contract.title}</h2>
       <p>{contract.description}</p>
+      <p></p>
       <div>
         <button
           className="bg-cyan-600 px-4 py-2 rounded-2xl mr-2"
@@ -50,6 +60,12 @@ const ContractDetails = () => {
           Download
         </button>
         <button className="bg-cyan-600 px-4 py-2 rounded-2xl">View PDF</button>
+        <button
+          className="bg-red-400 px-4 py-2 rounded-2xl ml-2"
+          onClick={deleteContract}
+        >
+          Delete
+        </button>
       </div>
     </div>
   );
