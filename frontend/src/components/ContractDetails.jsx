@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 const ContractDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [contract, setContract] = useState(null);
 
   useEffect(() => {
@@ -39,6 +40,7 @@ const ContractDetails = () => {
   const deleteContract = async () => {
     try {
       await axios.delete(`http://localhost:5000/api/contracts/${id}`);
+      navigate("/contracts");
     } catch (error) {
       console.error("Error deleting contract:", error);
     }

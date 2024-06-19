@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const upload = require("../config/multerConfig");
+const authenticateToken = require("../middleware/authenticateToken");
+const authorizeAdmin = require("../middleware/authorizeAdmin");
 
 const {
   getContracts,

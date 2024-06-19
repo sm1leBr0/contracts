@@ -2,152 +2,167 @@ import React, { useState } from "react";
 import axios from "axios";
 
 const ContractUploadForm = () => {
-  const [file, setFile] = useState(null);
-  const [title, setTitle] = useState("");
-  const [numberOfContract, setNumberOfContracts] = useState(null);
-  const [description, setDescription] = useState("");
-  const [date, setDate] = useState("");
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are zero-based
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  };
+  const [formData, setFormData] = useState({
+    title: "",
+    numberOfContract: 0,
+    date: "",
+    endDate: "",
+    description: "",
+    file: null,
+    counterparty: "",
+    performers: "",
+  });
 
   const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
+    setFormData({ ...formData, file: e.target.files[0] });
   };
-  const handleTitleChange = (e) => {
-    setTitle(e.target.value);
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
   };
-  const handleNumberChange = (e) => {
-    setNumberOfContracts(e.target.value);
-  };
-  const handleDescriptionChange = (e) => {
-    setDescription(e.target.value);
-  };
-  const handleDateChange = (e) => {
-    setDate(e.target.value);
-  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
+    const formDataToSubmit = new FormData();
 
-    formData.append("file", file);
-    formData.append("title", title);
-    formData.append("number", numberOfContract);
-    formData.append("description", description);
-    formData.append("date", date);
+    formDataToSubmit.append("file", formData.file);
+    formDataToSubmit.append("title", formData.title);
+    formDataToSubmit.append("number", formData.numberOfContract);
+    formDataToSubmit.append("description", formData.description);
+    formDataToSubmit.append("date", formData.date);
+    formDataToSubmit.append("end_date", formData.endDate);
+    formDataToSubmit.append("counterparty", formData.counterparty);
+    formDataToSubmit.append("performers", formData.performers);
 
     try {
-      await axios.post("http://127.0.0.1:5000/api/contracts/add", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+      await axios.post(
+        "http://127.0.0.1:5000/api/contracts/add",
+        formDataToSubmit,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      alert("Contract uploaded successfully!");
+      setFormData({
+        title: "",
+        numberOfContract: 0,
+        date: "",
+        endDate: "",
+        description: "",
+        file: null,
+        counterparty: "",
+        performers: "",
       });
-      alert("contract uploaded successfully!");
-      setTitle("");
-      setFile(null);
-      setDescription("");
-      setDate("");
-      setNumberOfContracts(0);
     } catch (error) {
       alert("Error uploading contract");
-      console.log(error);
+      console.error("Error:", error);
     }
   };
 
   return (
     <div className="max-w-3xl mx-auto mt-6 bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-xl font-semibold mb-4">Upload Contacts</h2>
+      <h2 className="text-xl font-semibold mb-4 text-center">
+        Upload Contract
+      </h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label
-            htmlFor="file"
-            className="block text-sm font-semibold text-gray-700"
-          >
-            File
-          </label>
+          <label htmlFor="title">Title</label>
+          <input
+            type="text"
+            id="title"
+            name="title"
+            value={formData.title}
+            onChange={handleInputChange}
+            required
+            className="form-element"
+          />
+        </div>
+        <div className="mb-4">
+          <label htmlFor="number">Contract Number</label>
+          <input
+            type="number"
+            id="number"
+            name="numberOfContract"
+            value={formData.numberOfContract}
+            onChange={handleInputChange}
+            required
+            className="form-element"
+          />
+        </div>
+        <div className="mb-4">
+          <label htmlFor="counterparty">Counterparty</label>
+          <input
+            type="text"
+            id="counterparty"
+            name="counterparty"
+            value={formData.counterparty}
+            onChange={handleInputChange}
+            required
+            className="form-element"
+          />
+        </div>
+        <div className="mb-4">
+          <label htmlFor="performers">Performers</label>
+          <input
+            type="text"
+            id="performers"
+            name="performers"
+            value={formData.performers}
+            onChange={handleInputChange}
+            required
+            className="form-element"
+          />
+        </div>
+        <div className="mb-4">
+          <label htmlFor="date">Date</label>
+          <input
+            type="date"
+            id="date"
+            name="date"
+            value={formData.date}
+            onChange={handleInputChange}
+            required
+            className="form-element"
+          />
+        </div>
+        <div className="mb-4">
+          <label htmlFor="end_date">End Date</label>
+          <input
+            type="date"
+            id="end_date"
+            name="endDate"
+            value={formData.endDate}
+            onChange={handleInputChange}
+            required
+            className="form-element"
+          />
+        </div>
+        <div className="mb-4">
+          <label htmlFor="description">Description</label>
+          <textarea
+            id="description"
+            name="description"
+            value={formData.description}
+            onChange={handleInputChange}
+            required
+            className="form-element"
+          ></textarea>
+        </div>
+        <div className="mb-4">
+          <label htmlFor="file">File</label>
           <input
             type="file"
             id="file"
             name="file"
             onChange={handleFileChange}
-            className=" mt-1 block border-gray-300 rounded-md shadow-sm
-             focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             required
+            className="form-element"
           />
-        </div>
-        <div className="mb-4">
-          <label
-            htmlFor="title"
-            className="block text-sm font-semibold text-gray-700"
-          >
-            Title
-          </label>
-          <input
-            type="text"
-            id="title"
-            name="title"
-            value={title}
-            onChange={handleTitleChange}
-            required
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm 
-            focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          />
-        </div>
-        <div className="mb-4">
-          <label
-            htmlFor="numberOfContract"
-            className="block text-sm font-semibold text-gray-700"
-          >
-            Number
-          </label>
-          <input
-            type="number"
-            id="number"
-            name="number"
-            value={numberOfContract}
-            onChange={handleNumberChange}
-            required
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm 
-            focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          />
-        </div>
-        <div className="mb-4">
-          <label
-            htmlFor="numberOfContract"
-            className="block text-sm font-semibold text-gray-700"
-          >
-            Date
-          </label>
-          <input
-            type="date"
-            id="date"
-            name="date"
-            value={date}
-            onChange={handleDateChange}
-            required
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm 
-            focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          />
-        </div>
-        <div className="mb-4">
-          <label
-            htmlFor="description"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Description
-          </label>
-          <textarea
-            id="description"
-            name="description"
-            value={description}
-            onChange={handleDescriptionChange}
-            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          ></textarea>
         </div>
         <button
           type="submit"

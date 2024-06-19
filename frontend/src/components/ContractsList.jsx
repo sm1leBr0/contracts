@@ -27,28 +27,26 @@ const ContractsList = ({ searchTerm }) => {
       <h2 className=" mx-0 text-center py-4 text-3xl">ContractsList</h2>
       <div>
         <table className="w-full text-sm text-left rtl:text-right">
-          <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+          <thead className="text-xs text-gray-700 uppercase">
             <tr className="">
               <th className="px-6 py-3">Назва</th>
               <th className="px-6 py-3">Контрагент</th>
               <th className="px-6 py-3">Номер договору</th>
               <th className="px-6 py-3">Дата</th>
               <th className="px-6 py-3">Дата закінчення</th>
-              <th className="px-6 py-3">Предмет договору</th>
               <th className="px-6 py-3">Виконавець</th>
               <th className="px-6 py-3">Примітка</th>
             </tr>
           </thead>
           <tbody>
             {data.map((item) => (
-              <tr key={item.id} className=" even:bg-slate-300">
+              <tr key={item.id} className="even:bg-slate-400">
                 <td className="px-6 py-3">{item.title}</td>
                 <td className="px-6 py-3">{item.counterparty}</td>
                 <td className="px-6 py-3">{item.number}</td>
                 <td className="px-6 py-3">{item.date}</td>
                 <td className="px-6 py-3">{item.end_date}</td>
-                <td className="px-6 py-3">{item.scope}</td>
-                <td className="px-6 py-3">{item.performers}</td>{" "}
+                <td className="px-6 py-3">{item.performers}</td>
                 <td className="px-6 py-3">{item.description}</td>
                 <td className="px-6 py-3">
                   <Link to={`/contracts/${item.id}`}>
