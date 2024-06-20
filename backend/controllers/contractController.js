@@ -59,12 +59,27 @@ exports.addContract = async (req, res) => {
 exports.getContracts = async (req, res) => {
   try {
     const { search } = req.query;
-    let baseQuery = "SELECT * FROM contracts";
+    let baseQuery = `
+      SELECT id, title, description, counterparty, number, 
+             TO_CHAR(date, 'YYYY-MM-DD') AS date, 
+             TO_CHAR(end_date, 'YYYY-MM-DD') AS end_date,
+             scope, performers, file_path, 
+             TO_CHAR(created_at, 'YYYY-MM-DD') AS created_at 
+      FROM contracts
+    `;
     const values = [];
 
     if (search) {
-      baseQuery +=
-        " WHERE title ILIKE $1 OR description ILIKE $1 OR counterparty ILIKE $1 OR number ILIKE $1 OR date::text ILIKE $1 OR end_date::text ILIKE $1 OR scope ILIKE $1 OR performers ILIKE $1";
+      baseQuery += `
+        WHERE title ILIKE $1 OR 
+              description ILIKE $1 OR 
+              counterparty ILIKE $1 OR 
+              number ILIKE $1 OR 
+              TO_CHAR(date, 'YYYY-MM-DD') ILIKE $1 OR 
+              TO_CHAR(end_date, 'YYYY-MM-DD') ILIKE $1 OR 
+              scope ILIKE $1 OR 
+              performers ILIKE $1
+      `;
       values.push(`%${search}%`);
     }
 
