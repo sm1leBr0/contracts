@@ -21,6 +21,14 @@ function App() {
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto  px-4 sm:px-6 lg:px-8 py-4 flex flex-row justify-between items-center">
           <h1 className="text-xl font-semibold">Contracts Managment</h1>
+          <nav className="flex justify-center">
+            <NavLink to="/contracts" className="mx-4">
+              Contracts
+            </NavLink>
+            <NavLink to="/upload" className="mx-4">
+              Upload
+            </NavLink>
+          </nav>
           <input
             type="text"
             value={searchTerm}
@@ -30,29 +38,16 @@ function App() {
           />
         </div>
       </header>
-      <main className=" max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <Router>
-          <nav className="flex justify-center">
-            <NavLink to="/contracts" className="mx-4">
-              Contracts
-            </NavLink>
-            <NavLink to="/upload" className="mx-4">
-              Upload
-            </NavLink>
-          </nav>
-          <Routes>
-            <Route
-              path="/contracts"
-              element={<ContractsList searchTerm={searchTerm} />}
-            />
-            <Route path="/upload" element={<ContractUploadForm />} />
-            <Route path="/contracts/:id" element={<ContractDetails />} />
-            <Route
-              path="/"
-              element={<ContractsList searchTerm={searchTerm} />}
-            />
-          </Routes>
-        </Router>
+      <main className="flex flex-col px-4 sm:px-6 lg:px-8 py-6">
+        <Routes>
+          <Route
+            path="/contracts"
+            element={<ContractsList searchTerm={searchTerm} />}
+          />
+          <Route path="/upload" element={<ContractUploadForm />} />
+          <Route path="/contracts/:id" element={<ContractDetails />} />
+          <Route path="/" element={<ContractsList searchTerm={searchTerm} />} />
+        </Routes>
       </main>
     </div>
   );
