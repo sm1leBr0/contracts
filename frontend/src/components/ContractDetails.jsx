@@ -6,12 +6,15 @@ const ContractDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [contract, setContract] = useState(null);
+  const [pdfUrl, setPdfUrl] = useState("");
 
   useEffect(() => {
     axios
       .get(`http://127.0.0.1:5000/api/contracts/${id}`)
       .then((res) => {
         setContract(res.data);
+        const filePath = res.data.file_path;
+        setPdfUrl(`http://127.0.0.1:5000/${filePath}`);
       })
       .catch((error) => {
         console.error("Error fetching contract:", error);
@@ -49,11 +52,15 @@ const ContractDetails = () => {
 
   return (
     <div>
-      <div></div>
-
       <h2>{contract.title}</h2>
       <p>{contract.description}</p>
-      <p></p>
+      <div>
+        <iframe
+          src={pdfUrl}
+          title="PDF Viewer"
+          className="w-[800px] h-[600px]"
+        />
+      </div>
       <div>
         <button
           className="bg-cyan-600 px-4 py-2 rounded-2xl mr-2"
@@ -61,7 +68,6 @@ const ContractDetails = () => {
         >
           Download
         </button>
-        <button className="bg-cyan-600 px-4 py-2 rounded-2xl">View PDF</button>
         <button
           className="bg-red-400 px-4 py-2 rounded-2xl ml-2"
           onClick={deleteContract}
