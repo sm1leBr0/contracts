@@ -1,12 +1,7 @@
 import ContractUploadForm from "./components/ContractUploadForm";
 import ContractsList from "./components/ContractsList";
 import ContractDetails from "./components/ContractDetails";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  NavLink,
-} from "react-router-dom";
+import { Routes, Route, NavLink } from "react-router-dom";
 import { useState } from "react";
 
 function App() {
@@ -17,11 +12,13 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="bg-white shadow-sm">
+    <div className="min-h-screen">
+      <header className="bg-gray-900 shadow-sm ">
         <div className="max-w-7xl mx-auto  px-4 sm:px-6 lg:px-8 py-4 flex flex-row justify-between items-center">
-          <h1 className="text-xl font-semibold">Contracts Managment</h1>
-          <nav className="flex justify-center">
+          <h1 className="text-xl  text-white font-semibold">
+            Contracts Managment
+          </h1>
+          <nav className="flex justify-center text-white">
             <NavLink to="/contracts" className="mx-4">
               Contracts
             </NavLink>
@@ -38,7 +35,7 @@ function App() {
           />
         </div>
       </header>
-      <main className="flex flex-col px-4 sm:px-6 lg:px-8 py-6">
+      <main className="flex flex-col justify-center mx-auto ">
         <Routes>
           <Route
             path="/contracts"

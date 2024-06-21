@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams, useNavigate } from "react-router-dom";
-import Form from "./Form";
+import { useParams } from "react-router-dom";
 
 const ContractDetails = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
+
   const [contract, setContract] = useState(null);
   const [pdfUrl, setPdfUrl] = useState("");
 
@@ -41,45 +40,58 @@ const ContractDetails = () => {
     }
   };
 
-  const deleteContract = async () => {
+  /* const deleteContract = async () => {
     try {
       await axios.delete(`http://localhost:5000/api/contracts/${id}`);
-      navigate("/contracts");
     } catch (error) {
       console.error("Error deleting contract:", error);
     }
-  };
+  }; */
+
   if (!contract) return <div>Loading...</div>;
-  console.log(contract);
+
   return (
-    <div className="flex flex-col">
-      <div className="flex justify-center ">
-        <div>
-          <Form formData={contract} />
-        </div>
-
-        <div className="flex justify-center align-middle ">
-          <iframe
-            src={pdfUrl}
-            title="PDF Viewer"
-            className="w-[800px] h-[600px] border-2 border-emerald-900"
-          />
-        </div>
-      </div>
-
-      <div>
+    <div className="max-w-7xl flex justify-between mx-auto h-full p-6">
+      <div className="max-w-xl bg-gray-200 shadow-lg rounded-lg p-6 mr-6">
+        <p className="text-lg font-semibold mb-2">
+          Назва: <span className="text-gray-700">{contract.title}</span>
+        </p>
+        <p className="text-lg font-semibold mb-2">
+          Номер договору:{" "}
+          <span className="text-gray-700">{contract.number}</span>
+        </p>
+        <p className="text-lg font-semibold mb-2">
+          Контрагент:{" "}
+          <span className="text-gray-700">{contract.counterparty}</span>
+        </p>
+        <p className="text-lg font-semibold mb-2">
+          Виконавець:{" "}
+          <span className="text-gray-700">{contract.performers}</span>
+        </p>
+        <p className="text-lg font-semibold mb-2">
+          Дата: <span className="text-gray-700">{contract.date}</span>
+        </p>
+        <p className="text-lg font-semibold mb-2">
+          Дата закінчення:{" "}
+          <span className="text-gray-700">{contract.end_date}</span>
+        </p>
+        <p className="text-lg font-semibold mb-4">
+          Примітка:{" "}
+          <span className="text-gray-700">{contract.description}</span>
+        </p>
         <button
-          className="bg-cyan-600 px-4 py-2 rounded-2xl mr-2"
+          className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded-2xl"
           onClick={handleDownload}
         >
           Download
         </button>
-        <button
-          className="bg-red-400 px-4 py-2 rounded-2xl ml-2"
-          onClick={deleteContract}
-        >
-          Delete
-        </button>
+      </div>
+      <div className="flex flex-col justify-center align-middle h-[800px] w-[900px] flex-grow">
+        <iframe
+          src={pdfUrl}
+          title="PDF Viewer"
+          className="w-full h-full border-2 border-emerald-900 rounded-lg"
+        />
       </div>
     </div>
   );

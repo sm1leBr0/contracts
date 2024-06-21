@@ -95,9 +95,15 @@ exports.getContracts = async (req, res) => {
 exports.getContractById = async (req, res) => {
   const { id } = req.params;
   try {
-    const contract = await pool.query("SELECT * FROM contracts WHERE id = $1", [
-      id,
-    ]);
+    const contract = await pool.query(
+      `SELECT id, title, description, counterparty, number, 
+             TO_CHAR(date, 'YYYY-MM-DD') AS date, 
+             TO_CHAR(end_date, 'YYYY-MM-DD') AS end_date,
+             scope, performers, file_path, 
+             TO_CHAR(created_at, 'YYYY-MM-DD') AS created_at 
+      FROM contracts WHERE id = $1`,
+      [id]
+    );
     if (contract.rows.length === 0) {
       return res.status(404).json({ error: "Contract not found" });
     }

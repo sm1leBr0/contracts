@@ -4,6 +4,7 @@
 
 .form-element {
   display: block;
+  min-width: 100px;
   width: 100%;
   padding: 0.35rem;
   border: 1px solid #d1d5db;
