@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
-const ContractDetails = () => {
+const ContractDetails = ({ auth }) => {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const [contract, setContract] = useState(null);
   const [pdfUrl, setPdfUrl] = useState("");
 
   useEffect(() => {
     axios
-      .get(`http://127.0.0.1:5000/api/contracts/${id}`)
+      .get(`http://127.0.0.1:5000/api/org/contracts/${id}`)
       .then((res) => {
         setContract(res.data);
         const filePath = res.data.file_path;
@@ -40,13 +41,21 @@ const ContractDetails = () => {
     }
   };
 
-  /* const deleteContract = async () => {
-    try {
-      await axios.delete(`http://localhost:5000/api/contracts/${id}`);
-    } catch (error) {
-      console.error("Error deleting contract:", error);
+  const deleteContract = async () => {
+    let removeConfirm = window.confirm("Дійсно бажаєте видалити контракт?");
+
+    if (removeConfirm) {
+      try {
+        await axios.delete(`http://localhost:5000/api/contracts/${id}`);
+        navigate("/contracts");
+      } catch (error) {
+        console.error("Error deleting contract:", error);
+      }
+    } else {
+      // User canceled the deletion
+      console.log("Deletion canceled by user.");
     }
-  }; */
+  };
 
   if (!contract) return <div>Loading...</div>;
 
@@ -85,6 +94,14 @@ const ContractDetails = () => {
         >
           Download
         </button>
+        {auth && (
+          <button
+            className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-2xl"
+            onClick={deleteContract}
+          >
+            Delete
+          </button>
+        )}
       </div>
       <div className="flex flex-col justify-center align-middle h-[800px] w-[900px] flex-grow">
         <iframe

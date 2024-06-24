@@ -2,11 +2,21 @@ const pool = require("../config/db");
 const fs = require("fs");
 const path = require("path");
 
+// Helper function to validate table names
+const validateTable = (table) => {
+  const validTables = ["protect", "aig"];
+  return validTables.includes(table);
+};
+
 // Download a contract file
 exports.downloadContractFile = (req, res) => {
-  const { id } = req.params;
+  const { table, id } = req.params;
+  if (!validateTable(table)) {
+    return res.status(400).json({ error: "Invalid table name" });
+  }
+
   pool.query(
-    "SELECT file_path FROM contracts WHERE id = $1",
+    `SELECT file_path FROM ${table} WHERE id = $1`,
     [id],
     (err, result) => {
       if (err) {
@@ -23,6 +33,11 @@ exports.downloadContractFile = (req, res) => {
 
 // Add a contract
 exports.addContract = async (req, res) => {
+  const { table } = req.params;
+  if (!validateTable(table)) {
+    return res.status(400).json({ error: "Invalid table name" });
+  }
+
   const {
     title,
     description,
@@ -36,7 +51,7 @@ exports.addContract = async (req, res) => {
   const file_path = req.file.path;
   try {
     const newContract = await pool.query(
-      "INSERT INTO contracts (title, description, counterparty, number, date, end_date, scope, performers, file_path) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *",
+      `INSERT INTO ${table} (title, description, counterparty, number, date, end_date, scope, performers, file_path) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
       [
         title,
         description,
@@ -57,6 +72,11 @@ exports.addContract = async (req, res) => {
 
 // Fetch all contracts
 exports.getContracts = async (req, res) => {
+  const { table } = req.params;
+  if (!validateTable(table)) {
+    return res.status(400).json({ error: "Invalid table name" });
+  }
+
   try {
     const { search } = req.query;
     let baseQuery = `
@@ -65,7 +85,7 @@ exports.getContracts = async (req, res) => {
              TO_CHAR(end_date, 'YYYY-MM-DD') AS end_date,
              scope, performers, file_path, 
              TO_CHAR(created_at, 'YYYY-MM-DD') AS created_at 
-      FROM contracts
+      FROM ${table}
     `;
     const values = [];
 
@@ -93,7 +113,11 @@ exports.getContracts = async (req, res) => {
 
 // Get a specific contract by ID
 exports.getContractById = async (req, res) => {
-  const { id } = req.params;
+  const { table, id } = req.params;
+  if (!validateTable(table)) {
+    return res.status(400).json({ error: "Invalid table name" });
+  }
+
   try {
     const contract = await pool.query(
       `SELECT id, title, description, counterparty, number, 
@@ -101,7 +125,7 @@ exports.getContractById = async (req, res) => {
              TO_CHAR(end_date, 'YYYY-MM-DD') AS end_date,
              scope, performers, file_path, 
              TO_CHAR(created_at, 'YYYY-MM-DD') AS created_at 
-      FROM contracts WHERE id = $1`,
+      FROM ${table} WHERE id = $1`,
       [id]
     );
     if (contract.rows.length === 0) {
@@ -115,7 +139,11 @@ exports.getContractById = async (req, res) => {
 
 // Update a contract
 exports.updateContract = async (req, res) => {
-  const { id } = req.params;
+  const { table, id } = req.params;
+  if (!validateTable(table)) {
+    return res.status(400).json({ error: "Invalid table name" });
+  }
+
   const {
     title,
     description,
@@ -129,7 +157,7 @@ exports.updateContract = async (req, res) => {
   } = req.body;
   try {
     const updatedContract = await pool.query(
-      "UPDATE contracts SET title = $1, description = $2, counterparty = $3, number = $4, date = $5, end_date = $6, scope = $7, performers = $8, file_path = $9 WHERE id = $10 RETURNING *",
+      `UPDATE ${table} SET title = $1, description = $2, counterparty = $3, number = $4, date = $5, end_date = $6, scope = $7, performers = $8, file_path = $9 WHERE id = $10 RETURNING *`,
       [
         title,
         description,
@@ -154,10 +182,14 @@ exports.updateContract = async (req, res) => {
 
 // Delete a contract
 exports.deleteContract = async (req, res) => {
-  const { id } = req.params;
+  const { table, id } = req.params;
+  if (!validateTable(table)) {
+    return res.status(400).json({ error: "Invalid table name" });
+  }
+
   try {
     const result = await pool.query(
-      "SELECT file_path FROM contracts WHERE id = $1",
+      `SELECT file_path FROM ${table} WHERE id = $1`,
       [id]
     );
     if (result.rows.length === 0) {
@@ -167,7 +199,7 @@ exports.deleteContract = async (req, res) => {
     const filePath = result.rows[0].file_path;
 
     const deletedContract = await pool.query(
-      "DELETE FROM contracts WHERE id = $1 RETURNING *",
+      `DELETE FROM ${table} WHERE id = $1 RETURNING *`,
       [id]
     );
     if (deletedContract.rows.length === 0) {

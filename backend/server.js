@@ -10,8 +10,21 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const adminUsername = "admin";
+const adminPassword = "password";
+
+app.post("/api/admin/login", (req, res) => {
+  const { username, password } = req.body;
+
+  if (username === adminUsername && password === adminPassword) {
+    res.status(200).json({ token: "admin-token" });
+  } else {
+    res.status(401).json({ error: "Invalid credentials" });
+  }
+});
+
 // Contract routes
-app.use("/api/contracts", contractRoutes);
+app.use("/api", contractRoutes);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.get("/", (req, res) => {

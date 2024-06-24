@@ -2,13 +2,13 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
-const ContractsList = ({ searchTerm }) => {
+const ContractsList = ({ searchTerm, org }) => {
   const [data, setData] = useState([]);
   useEffect(() => {
     const fetchContracts = async (query) => {
       try {
         axios
-          .get("http://127.0.0.1:5000/api/contracts", {
+          .get(`http://127.0.0.1:5000/api/${org}/contracts`, {
             params: {
               search: query || "",
             },
@@ -21,7 +21,7 @@ const ContractsList = ({ searchTerm }) => {
       }
     };
     fetchContracts(searchTerm);
-  }, [searchTerm]);
+  }, [searchTerm, org]);
   return (
     <div className="max-w-7xl mx-auto">
       <h2 className="text-center py-4 text-3xl font-bold">Contracts List</h2>
@@ -52,7 +52,7 @@ const ContractsList = ({ searchTerm }) => {
                   <td className="px-4 py-2">{item.performers}</td>
                   <td className="px-4 py-2">{item.description}</td>
                   <td className="px-4 py-2 text-center">
-                    <Link to={`/contracts/${item.id}`}>
+                    <Link to={`/org/contracts/${item.id}`}>
                       <button className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg">
                         Details
                       </button>
