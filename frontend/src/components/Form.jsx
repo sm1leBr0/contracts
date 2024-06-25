@@ -14,7 +14,9 @@ const Form = ({
     performers,
     date,
     endDate,
-  } = { formData };
+    organisation,
+  } = formData; // Corrected the destructuring here
+
   return (
     <div className="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md">
       <h2 className="text-xl font-semibold mb-4 text-center">
@@ -32,6 +34,33 @@ const Form = ({
             required
             className="form-element"
           />
+        </div>
+        <div className="mb-4">
+          <label>Organisation</label>
+          <div>
+            <input
+              type="radio"
+              id="protect"
+              name="organisation"
+              value="protect"
+              checked={organisation === "protect"}
+              onChange={handleInputChange}
+              required
+            />
+            <label htmlFor="protect">Protect</label>
+          </div>
+          <div>
+            <input
+              type="radio"
+              id="aig"
+              name="organisation"
+              value="aig"
+              checked={organisation === "aig"}
+              onChange={handleInputChange}
+              required
+            />
+            <label htmlFor="aig">AIG</label>
+          </div>
         </div>
         <div className="mb-4">
           <label htmlFor="number">Contract Number</label>

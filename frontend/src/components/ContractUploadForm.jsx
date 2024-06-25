@@ -12,6 +12,7 @@ const ContractUploadForm = () => {
     file: null,
     counterparty: "",
     performers: "",
+    organisation: "protect",
   });
 
   const handleFileChange = (e) => {
@@ -37,10 +38,11 @@ const ContractUploadForm = () => {
     formDataToSubmit.append("end_date", formData.endDate);
     formDataToSubmit.append("counterparty", formData.counterparty);
     formDataToSubmit.append("performers", formData.performers);
+    formDataToSubmit.append("organisation", formData.organisation);
 
     try {
       await axios.post(
-        "http://127.0.0.1:5000/api/contracts/add",
+        `http://127.0.0.1:5000/api/${formData.organisation}/add`,
         formDataToSubmit,
         {
           headers: {
@@ -58,6 +60,7 @@ const ContractUploadForm = () => {
         file: null,
         counterparty: "",
         performers: "",
+        organisation: "protect",
       });
     } catch (error) {
       alert("Error uploading contract");

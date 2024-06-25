@@ -3,7 +3,7 @@ import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 
 const ContractDetails = ({ auth }) => {
-  const { id } = useParams();
+  const { org, id } = useParams();
   const navigate = useNavigate();
 
   const [contract, setContract] = useState(null);
@@ -11,7 +11,7 @@ const ContractDetails = ({ auth }) => {
 
   useEffect(() => {
     axios
-      .get(`http://127.0.0.1:5000/api/org/contracts/${id}`)
+      .get(`http://127.0.0.1:5000/api/${org}/${id}`)
       .then((res) => {
         setContract(res.data);
         const filePath = res.data.file_path;
@@ -20,14 +20,14 @@ const ContractDetails = ({ auth }) => {
       .catch((error) => {
         console.error("Error fetching contract:", error);
       });
-  }, [id]);
+  }, [id, org]);
 
   const handleDownload = async () => {
     try {
       const response = await axios.get(
-        `http://127.0.0.1:5000/api/contracts/download/${id}`,
+        `http://127.0.0.1:5000/api/${org}/download/${id}`,
         {
-          responseType: "blob", // Important
+          responseType: "blob",
         }
       );
       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -46,13 +46,12 @@ const ContractDetails = ({ auth }) => {
 
     if (removeConfirm) {
       try {
-        await axios.delete(`http://localhost:5000/api/contracts/${id}`);
+        await axios.delete(`http://localhost:5000/api/${org}/${id}`);
         navigate("/contracts");
       } catch (error) {
         console.error("Error deleting contract:", error);
       }
     } else {
-      // User canceled the deletion
       console.log("Deletion canceled by user.");
     }
   };
@@ -92,14 +91,14 @@ const ContractDetails = ({ auth }) => {
           className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded-2xl"
           onClick={handleDownload}
         >
-          Download
+          Завантажити
         </button>
         {auth && (
           <button
             className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-2xl"
             onClick={deleteContract}
           >
-            Delete
+            Видалити
           </button>
         )}
       </div>
