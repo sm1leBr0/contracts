@@ -1,6 +1,7 @@
 import ContractUploadForm from "./components/ContractUploadForm";
 import ContractsList from "./components/ContractsList";
 import ContractDetails from "./components/ContractDetails";
+import UpdateContractForm from "./components/UpdateContractForm";
 import { Routes, Route, NavLink, Navigate } from "react-router-dom";
 import { useState } from "react";
 import Login from "./components/Login";
@@ -73,6 +74,10 @@ function App() {
           />
           <Route path="/:org/:id" element={<ContractDetails auth={auth} />} />
           <Route path="/login" element={<Login setAuth={setAuth} />} />
+          <Route
+            path="/:org/update/:id"
+            element={<UpdateContractForm org={organisation} />}
+          />
           <Route
             path="/"
             element={<ContractsList searchTerm={searchTerm} org="protect" />}

@@ -94,12 +94,20 @@ const ContractDetails = ({ auth }) => {
           Завантажити
         </button>
         {auth && (
-          <button
-            className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-2xl"
-            onClick={deleteContract}
-          >
-            Видалити
-          </button>
+          <div>
+            <button
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl ml-2"
+              onClick={() => navigate(`/${org}/update/${id}`)}
+            >
+              Update
+            </button>
+            <button
+              className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-2xl"
+              onClick={deleteContract}
+            >
+              Видалити
+            </button>
+          </div>
         )}
       </div>
       <div className="flex flex-col justify-center align-middle h-[800px] w-[900px] flex-grow">

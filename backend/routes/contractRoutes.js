@@ -18,7 +18,7 @@ router.get("/:table/contracts", getContracts);
 // Route for fetching a specific contract by ID
 router.get("/:table/:id", getContractById);
 // Route for updating a contract
-router.put("/:table/:id", updateContract);
+router.put("/:table/update/:id", upload.single("file"), updateContract);
 
 // Route for deleting a contract
 router.delete("/:table/:id", deleteContract);

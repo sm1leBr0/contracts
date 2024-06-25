@@ -137,49 +137,6 @@ exports.getContractById = async (req, res) => {
   }
 };
 
-// Update a contract
-exports.updateContract = async (req, res) => {
-  const { table, id } = req.params;
-  if (!validateTable(table)) {
-    return res.status(400).json({ error: "Invalid table name" });
-  }
-
-  const {
-    title,
-    description,
-    counterparty,
-    number,
-    date,
-    end_date,
-    scope,
-    performers,
-    file_path,
-  } = req.body;
-  try {
-    const updatedContract = await pool.query(
-      `UPDATE ${table} SET title = $1, description = $2, counterparty = $3, number = $4, date = $5, end_date = $6, scope = $7, performers = $8, file_path = $9 WHERE id = $10 RETURNING *`,
-      [
-        title,
-        description,
-        counterparty,
-        number,
-        date,
-        end_date,
-        scope,
-        performers,
-        file_path,
-        id,
-      ]
-    );
-    if (updatedContract.rows.length === 0) {
-      return res.status(404).json({ error: "Contract not found" });
-    }
-    res.status(200).json(updatedContract.rows[0]);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
 // Delete a contract
 exports.deleteContract = async (req, res) => {
   const { table, id } = req.params;
@@ -215,6 +172,96 @@ exports.deleteContract = async (req, res) => {
       console.log("File deleted successfully");
     });
     res.status(200).json({ message: "Contract deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.updateContract = async (req, res) => {
+  const { table, id } = req.params;
+  if (!validateTable(table)) {
+    return res.status(400).json({ error: "Invalid table name" });
+  }
+
+  const {
+    title,
+    description,
+    counterparty,
+    number,
+    date,
+    end_date,
+    scope,
+    performers,
+  } = req.body;
+
+  const fieldsToUpdate = {};
+  const updateParams = [];
+  let paramIndex = 1;
+
+  // Prepare fields and params to update
+  if (title !== undefined) {
+    fieldsToUpdate.title = title;
+    updateParams.push(title);
+  }
+  if (description !== undefined) {
+    fieldsToUpdate.description = description;
+    updateParams.push(description);
+  }
+  if (counterparty !== undefined) {
+    fieldsToUpdate.counterparty = counterparty;
+    updateParams.push(counterparty);
+  }
+  if (number !== undefined) {
+    fieldsToUpdate.number = number;
+    updateParams.push(number);
+  }
+  if (date !== undefined) {
+    fieldsToUpdate.date = date;
+    updateParams.push(date);
+  }
+  if (end_date !== undefined) {
+    fieldsToUpdate.end_date = end_date;
+    updateParams.push(end_date);
+  }
+  if (scope !== undefined) {
+    fieldsToUpdate.scope = scope;
+    updateParams.push(scope);
+  }
+  if (performers !== undefined) {
+    fieldsToUpdate.performers = performers;
+    updateParams.push(performers);
+  }
+
+  // Handle file upload if included in the request
+  if (req.file) {
+    const file_path = req.file.path;
+    fieldsToUpdate.file_path = file_path;
+    updateParams.push(file_path);
+  }
+
+  if (Object.keys(fieldsToUpdate).length === 0) {
+    return res
+      .status(400)
+      .json({ error: "No valid fields provided for update" });
+  }
+
+  updateParams.push(id); // Push id for WHERE clause
+
+  try {
+    const setClause = Object.keys(fieldsToUpdate)
+      .map((key, index) => `${key} = $${index + 1}`)
+      .join(", ");
+
+    const updateContract = await pool.query(
+      `UPDATE ${table} SET ${setClause} WHERE id = $${updateParams.length} RETURNING *`,
+      updateParams
+    );
+
+    if (updateContract.rows.length === 0) {
+      return res.status(404).json({ error: "Contract not found" });
+    }
+
+    res.status(200).json(updateContract.rows[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

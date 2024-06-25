@@ -5,6 +5,7 @@ const Form = ({
   handleFileChange,
   handleInputChange,
   formData,
+  isUpdate,
 }) => {
   const {
     title,
@@ -15,12 +16,12 @@ const Form = ({
     date,
     endDate,
     organisation,
-  } = formData; // Corrected the destructuring here
+  } = formData;
 
   return (
     <div className="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md">
       <h2 className="text-xl font-semibold mb-4 text-center">
-        Upload Contract
+        {isUpdate ? "Update Contract" : "Upload Contract"}
       </h2>
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
@@ -34,33 +35,6 @@ const Form = ({
             required
             className="form-element"
           />
-        </div>
-        <div className="mb-4">
-          <label>Organisation</label>
-          <div>
-            <input
-              type="radio"
-              id="protect"
-              name="organisation"
-              value="protect"
-              checked={organisation === "protect"}
-              onChange={handleInputChange}
-              required
-            />
-            <label htmlFor="protect">Protect</label>
-          </div>
-          <div>
-            <input
-              type="radio"
-              id="aig"
-              name="organisation"
-              value="aig"
-              checked={organisation === "aig"}
-              onChange={handleInputChange}
-              required
-            />
-            <label htmlFor="aig">AIG</label>
-          </div>
         </div>
         <div className="mb-4">
           <label htmlFor="number">Contract Number</label>
@@ -133,13 +107,41 @@ const Form = ({
           ></textarea>
         </div>
         <div className="mb-4">
+          <label>Organisation</label>
+          <div>
+            <input
+              type="radio"
+              id="protect"
+              name="organisation"
+              value="protect"
+              checked={organisation === "protect"}
+              onChange={handleInputChange}
+              required
+              disabled={isUpdate}
+            />
+            <label htmlFor="protect">Protect</label>
+          </div>
+          <div>
+            <input
+              type="radio"
+              id="aig"
+              name="organisation"
+              value="aig"
+              checked={organisation === "aig"}
+              onChange={handleInputChange}
+              required
+              disabled={isUpdate}
+            />
+            <label htmlFor="aig">AIG</label>
+          </div>
+        </div>
+        <div className="mb-4">
           <label htmlFor="file">File</label>
           <input
             type="file"
             id="file"
             name="file"
             onChange={handleFileChange}
-            required
             className="form-element"
           />
         </div>
@@ -147,7 +149,7 @@ const Form = ({
           type="submit"
           className="inline-block bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          Upload Contract
+          {isUpdate ? "Update Contract" : "Upload Contract"}
         </button>
       </form>
     </div>
