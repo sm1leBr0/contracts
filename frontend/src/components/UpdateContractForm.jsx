@@ -6,7 +6,6 @@ import Form from "./Form";
 const UpdateContractForm = ({ org }) => {
   const { id } = useParams();
   const navigate = useNavigate();
-
   const [formData, setFormData] = useState({
     title: "",
     numberOfContract: "",
@@ -55,7 +54,6 @@ const UpdateContractForm = ({ org }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formDataToSubmit = new FormData();
-
     if (formData.file) {
       formDataToSubmit.append("file", formData.file);
     }
@@ -86,13 +84,15 @@ const UpdateContractForm = ({ org }) => {
   };
 
   return (
-    <Form
-      handleFileChange={handleFileChange}
-      handleInputChange={handleInputChange}
-      handleSubmit={handleSubmit}
-      formData={formData}
-      isUpdate={true}
-    />
+    <>
+      <Form
+        handleFileChange={handleFileChange}
+        handleInputChange={handleInputChange}
+        handleSubmit={handleSubmit}
+        formData={formData}
+        isUpdate={true}
+      />
+    </>
   );
 };
 
