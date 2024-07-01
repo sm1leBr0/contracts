@@ -8,6 +8,45 @@ const validateTable = (table) => {
   return validTables.includes(table);
 };
 
+const getOrInsertCounterparty = async (name) => {
+  const result = await pool.query(
+    `INSERT INTO counterparties (name) VALUES ($1)
+     ON CONFLICT (name) DO NOTHING
+     RETURNING id`,
+    [name]
+  );
+
+  if (result.rows.length > 0) {
+    return result.rows[0].id;
+  } else {
+    const selectResult = await pool.query(
+      `SELECT id FROM counterparties WHERE name = $1`,
+      [name]
+    );
+    return selectResult.rows[0].id;
+  }
+};
+
+// Helper function to get or insert a performer and return its ID
+const getOrInsertPerformer = async (name) => {
+  const result = await pool.query(
+    `INSERT INTO performers (name) VALUES ($1)
+     ON CONFLICT (name) DO NOTHING
+     RETURNING id`,
+    [name]
+  );
+
+  if (result.rows.length > 0) {
+    return result.rows[0].id;
+  } else {
+    const selectResult = await pool.query(
+      `SELECT id FROM performers WHERE name = $1`,
+      [name]
+    );
+    return selectResult.rows[0].id;
+  }
+};
+
 // Download a contract file
 exports.downloadContractFile = (req, res) => {
   const { table, id } = req.params;
@@ -49,18 +88,23 @@ exports.addContract = async (req, res) => {
     performers,
   } = req.body;
   const file_path = req.file.path;
+
   try {
+    const counterparty_id = await getOrInsertCounterparty(counterparty);
+    const performer_id = await getOrInsertPerformer(performers);
+
     const newContract = await pool.query(
-      `INSERT INTO ${table} (title, description, counterparty, number, date, end_date, scope, performers, file_path) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
+      `INSERT INTO ${table} (title, description, counterparty_id, number, date, end_date, scope, performer_id, file_path) 
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
       [
         title,
         description,
-        counterparty,
+        counterparty_id,
         number,
         date,
         end_date,
         scope,
-        performers,
+        performer_id,
         file_path,
       ]
     );
@@ -80,25 +124,34 @@ exports.getContracts = async (req, res) => {
   try {
     const { search } = req.query;
     let baseQuery = `
-      SELECT id, title, description, counterparty, number, 
-             TO_CHAR(date, 'YYYY-MM-DD') AS date, 
-             TO_CHAR(end_date, 'YYYY-MM-DD') AS end_date,
-             scope, performers, file_path, 
-             TO_CHAR(created_at, 'YYYY-MM-DD') AS created_at 
+      SELECT 
+        ${table}.id, 
+        ${table}.title, 
+        ${table}.description, 
+        counterparties.name AS counterparty, 
+        ${table}.number, 
+        TO_CHAR(${table}.date, 'YYYY.MM.DD') AS date, 
+        TO_CHAR(${table}.end_date, 'YYYY.MM.DD') AS end_date,
+        ${table}.scope, 
+        performers.name AS performers, 
+        ${table}.file_path, 
+        TO_CHAR(${table}.created_at, 'YYYY-MM-DD') AS created_at 
       FROM ${table}
+      LEFT JOIN counterparties ON ${table}.counterparty_id = counterparties.id
+      LEFT JOIN performers ON ${table}.performer_id = performers.id
     `;
     const values = [];
 
     if (search) {
       baseQuery += `
-        WHERE title ILIKE $1 OR 
-              description ILIKE $1 OR 
-              counterparty ILIKE $1 OR 
-              number ILIKE $1 OR 
-              TO_CHAR(date, 'YYYY-MM-DD') ILIKE $1 OR 
-              TO_CHAR(end_date, 'YYYY-MM-DD') ILIKE $1 OR 
-              scope ILIKE $1 OR 
-              performers ILIKE $1
+        WHERE ${table}.title ILIKE $1 OR 
+              ${table}.description ILIKE $1 OR 
+              counterparties.name ILIKE $1 OR 
+              ${table}.number ILIKE $1 OR 
+              TO_CHAR(${table}.date, 'YYYY.MM.DD') ILIKE $1 OR 
+              TO_CHAR(${table}.end_date, 'YYYY.MM.DD') ILIKE $1 OR 
+              ${table}.scope ILIKE $1 OR 
+              performers.name ILIKE $1
       `;
       values.push(`%${search}%`);
     }
@@ -120,12 +173,22 @@ exports.getContractById = async (req, res) => {
 
   try {
     const contract = await pool.query(
-      `SELECT id, title, description, counterparty, number, 
-             TO_CHAR(date, 'YYYY-MM-DD') AS date, 
-             TO_CHAR(end_date, 'YYYY-MM-DD') AS end_date,
-             scope, performers, file_path, 
-             TO_CHAR(created_at, 'YYYY-MM-DD') AS created_at 
-      FROM ${table} WHERE id = $1`,
+      `SELECT 
+         ${table}.id, 
+         ${table}.title, 
+         ${table}.description, 
+         counterparties.name AS counterparty, 
+         ${table}.number, 
+         TO_CHAR(${table}.date, 'YYYY.MM.DD') AS date, 
+         TO_CHAR(${table}.end_date, 'YYYY.MM.DD') AS end_date,
+         ${table}.scope, 
+         performers.name AS performers, 
+         ${table}.file_path, 
+         TO_CHAR(${table}.created_at, 'YYYY.MM.DD') AS created_at 
+      FROM ${table}
+      LEFT JOIN counterparties ON ${table}.counterparty_id = counterparties.id
+      LEFT JOIN performers ON ${table}.performer_id = performers.id
+      WHERE ${table}.id = $1`,
       [id]
     );
     if (contract.rows.length === 0) {
@@ -177,6 +240,7 @@ exports.deleteContract = async (req, res) => {
   }
 };
 
+//update contract
 exports.updateContract = async (req, res) => {
   const { table, id } = req.params;
   if (!validateTable(table)) {
@@ -208,8 +272,9 @@ exports.updateContract = async (req, res) => {
     updateParams.push(description);
   }
   if (counterparty !== undefined) {
-    fieldsToUpdate.counterparty = counterparty;
-    updateParams.push(counterparty);
+    const counterparty_id = await getOrInsertCounterparty(counterparty);
+    fieldsToUpdate.counterparty_id = counterparty_id;
+    updateParams.push(counterparty_id);
   }
   if (number !== undefined) {
     fieldsToUpdate.number = number;
@@ -228,8 +293,9 @@ exports.updateContract = async (req, res) => {
     updateParams.push(scope);
   }
   if (performers !== undefined) {
-    fieldsToUpdate.performers = performers;
-    updateParams.push(performers);
+    const performer_id = await getOrInsertPerformer(performers);
+    fieldsToUpdate.performer_id = performer_id;
+    updateParams.push(performer_id);
   }
 
   // Handle file upload if included in the request
