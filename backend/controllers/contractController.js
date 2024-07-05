@@ -8,42 +8,98 @@ const validateTable = (table) => {
   return validTables.includes(table);
 };
 
-const getOrInsertCounterparty = async (name) => {
-  const result = await pool.query(
-    `INSERT INTO counterparties (name) VALUES ($1)
-     ON CONFLICT (name) DO NOTHING
-     RETURNING id`,
-    [name]
-  );
+// Get counterparty suggestions
+exports.getCounterpartySuggestions = async (req, res) => {
+  const { query } = req.query;
 
-  if (result.rows.length > 0) {
-    return result.rows[0].id;
-  } else {
-    const selectResult = await pool.query(
-      `SELECT id FROM counterparties WHERE name = $1`,
-      [name]
+  // Перевірка наявності параметра query
+  if (!query) {
+    return res.status(400).json({ error: "Query parameter is missing" });
+  }
+
+  try {
+    // Логування параметра для перевірки
+    console.log("Query parameter:", query);
+
+    // Запит до бази даних
+    const result = await pool.query(
+      `SELECT name FROM counterparty WHERE name ILIKE $1`,
+      [`%${query}%`]
     );
-    return selectResult.rows[0].id;
+
+    // Логування результатів запиту для перевірки
+    console.log("Query result:", result.rows);
+
+    // Перевірка результатів запиту
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "No suggestions found" });
+    }
+
+    // Відповідь з результатами
+    res.json(result.rows.map((row) => row.name));
+  } catch (err) {
+    console.error("Database query error:", err.message);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
-// Helper function to get or insert a performer and return its ID
-const getOrInsertPerformer = async (name) => {
-  const result = await pool.query(
-    `INSERT INTO performers (name) VALUES ($1)
-     ON CONFLICT (name) DO NOTHING
-     RETURNING id`,
-    [name]
-  );
-
-  if (result.rows.length > 0) {
-    return result.rows[0].id;
-  } else {
-    const selectResult = await pool.query(
-      `SELECT id FROM performers WHERE name = $1`,
+// Add a counterparty
+exports.addCounterparty = async (req, res) => {
+  const { name } = req.body;
+  try {
+    const result = await pool.query(
+      `INSERT INTO counterparty (name) VALUES ($1) ON CONFLICT (name) DO NOTHING RETURNING id`,
       [name]
     );
-    return selectResult.rows[0].id;
+
+    if (result.rows.length > 0) {
+      res.status(201).json({ id: result.rows[0].id });
+    } else {
+      const selectResult = await pool.query(
+        `SELECT id FROM counterparty WHERE name = $1`,
+        [name]
+      );
+      res.status(200).json({ id: selectResult.rows[0].id });
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Get performer suggestions
+exports.getPerformerSuggestions = async (req, res) => {
+  const { query } = req.query;
+  try {
+    const result = await pool.query(
+      `SELECT name FROM performers WHERE name ILIKE $1`,
+      [`%${query}%`]
+    );
+    res.json(result.rows.map((row) => row.name));
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Add a performer
+exports.addPerformer = async (req, res) => {
+  const { name } = req.body;
+  try {
+    const result = await pool.query(
+      `INSERT INTO performers (name) VALUES ($1) ON CONFLICT (name) DO NOTHING RETURNING id`,
+      [name]
+    );
+
+    if (result.rows.length > 0) {
+      res.status(201).json({ id: result.rows[0].id });
+    } else {
+      const selectResult = await pool.query(
+        `SELECT id FROM performers WHERE name = $1`,
+        [name]
+      );
+      res.status(200).json({ id: selectResult.rows[0].id });
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };
 

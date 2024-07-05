@@ -5,6 +5,12 @@ const Form = ({
   handleFileChange,
   handleInputChange,
   formData,
+  handleCounterpartyChange,
+  handlePerformersChange,
+  handleCounterpartySelect,
+  handlePerformerSelect,
+  counterpartySuggestions,
+  performerSuggestions,
   isUpdate,
 }) => {
   const {
@@ -55,10 +61,20 @@ const Form = ({
             id="counterparty"
             name="counterparty"
             value={counterparty}
-            onChange={handleInputChange}
-            required
+            onChange={handleCounterpartyChange}
             className="form-element"
           />
+          <ul className="border border-gray-300 mt-1 max-h-32 overflow-auto">
+            {counterpartySuggestions.map((suggestion, index) => (
+              <li
+                key={index}
+                className="p-2 hover:bg-gray-100 cursor-pointer"
+                onClick={() => handleCounterpartySelect(suggestion)}
+              >
+                {suggestion}
+              </li>
+            ))}
+          </ul>
         </div>
         <div className="mb-4">
           <label htmlFor="performers">Performers</label>
@@ -67,10 +83,20 @@ const Form = ({
             id="performers"
             name="performers"
             value={performers}
-            onChange={handleInputChange}
-            required
+            onChange={handlePerformersChange}
             className="form-element"
           />
+          <ul className="border border-gray-300 mt-1 max-h-32 overflow-auto">
+            {performerSuggestions.map((suggestion, index) => (
+              <li
+                key={index}
+                className="p-2 hover:bg-gray-100 cursor-pointer"
+                onClick={() => handlePerformerSelect(suggestion)}
+              >
+                {suggestion}
+              </li>
+            ))}
+          </ul>
         </div>
         <div className="mb-4">
           <label htmlFor="date">Date</label>
@@ -85,10 +111,10 @@ const Form = ({
           />
         </div>
         <div className="mb-4">
-          <label htmlFor="end_date">End Date</label>
+          <label htmlFor="endDate">End Date</label>
           <input
             type="date"
-            id="end_date"
+            id="endDate"
             name="endDate"
             value={endDate}
             onChange={handleInputChange}
@@ -103,51 +129,24 @@ const Form = ({
             name="description"
             value={description}
             onChange={handleInputChange}
+            required
             className="form-element"
-          ></textarea>
+          />
         </div>
         <div className="mb-4">
-          <label>Organisation</label>
-          <div>
-            <input
-              type="radio"
-              id="protect"
-              name="organisation"
-              value="protect"
-              checked={organisation === "protect"}
-              onChange={handleInputChange}
-              required
-              disabled={isUpdate}
-            />
-            <label htmlFor="protect">Protect</label>
-          </div>
-          <div>
-            <input
-              type="radio"
-              id="aig"
-              name="organisation"
-              value="aig"
-              checked={organisation === "aig"}
-              onChange={handleInputChange}
-              required
-              disabled={isUpdate}
-            />
-            <label htmlFor="aig">AIG</label>
-          </div>
-        </div>
-        <div className="mb-4">
-          <label htmlFor="file">File</label>
+          <label htmlFor="file">Upload File</label>
           <input
             type="file"
             id="file"
             name="file"
             onChange={handleFileChange}
+            required
             className="form-element"
           />
         </div>
         <button
           type="submit"
-          className="inline-block bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           {isUpdate ? "Update Contract" : "Upload Contract"}
         </button>
