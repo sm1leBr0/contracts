@@ -15,30 +15,6 @@ const ContractUploadForm = () => {
     organisation: "protect",
   });
 
-  const [counterpartySuggestions, setCounterpartySuggestions] = useState([]);
-  const [performerSuggestions, setPerformerSuggestions] = useState([]);
-
-  // Fetch initial counterparty and performer data
-  useEffect(() => {
-    const fetchInitialData = async () => {
-      try {
-        const [counterpartyRes, performersRes] = await Promise.all([
-          axios.get("http://127.0.0.1:5000/api/counterparty/suggest", {
-            params: { query: " " },
-          }),
-          axios.get("http://127.0.0.1:5000/api/performers/suggest", {
-            params: { query: " " },
-          }),
-        ]);
-        setCounterpartySuggestions(counterpartyRes.data);
-        setPerformerSuggestions(performersRes.data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-    fetchInitialData();
-  }, []);
-
   const handleFileChange = (e) => {
     setFormData({ ...formData, file: e.target.files[0] });
   };
@@ -49,78 +25,6 @@ const ContractUploadForm = () => {
       ...formData,
       [name]: value,
     });
-  };
-
-  const handleCounterpartyChange = async (e) => {
-    const value = e.target.value;
-    setFormData({ ...formData, counterparty: value });
-
-    // Fetch counterparty suggestions based on user input
-    if (value) {
-      try {
-        const response = await axios.get(
-          "http://127.0.0.1:5000/api/counterparty/suggest",
-          { params: { query: value } }
-        );
-        setCounterpartySuggestions(response.data);
-      } catch (error) {
-        console.error("Error fetching counterparty suggestions:", error);
-      }
-    } else {
-      setCounterpartySuggestions([]);
-    }
-  };
-
-  const handlePerformersChange = async (e) => {
-    const value = e.target.value;
-    setFormData({ ...formData, performers: value });
-
-    // Fetch performer suggestions based on user input
-    if (value) {
-      try {
-        const response = await axios.get(
-          "http://127.0.0.1:5000/api/performers/suggest",
-          { params: { query: value } }
-        );
-        setPerformerSuggestions(response.data);
-      } catch (error) {
-        console.error("Error fetching performer suggestions:", error);
-      }
-    } else {
-      setPerformerSuggestions([]);
-    }
-  };
-
-  const handleCounterpartySelect = async (counterparty) => {
-    setFormData({ ...formData, counterparty });
-
-    // Clear suggestions and check if the selected counterparty needs to be added
-    setCounterpartySuggestions([]);
-    try {
-      await axios.post("http://127.0.0.1:5000/api/counterparty", {
-        name: counterparty,
-      });
-      alert("Counterparty added successfully!");
-    } catch (error) {
-      console.error("Error adding counterparty:", error);
-      alert("Error adding counterparty");
-    }
-  };
-
-  const handlePerformerSelect = async (performer) => {
-    setFormData({ ...formData, performers: performer });
-
-    // Clear suggestions and check if the selected performer needs to be added
-    setPerformerSuggestions([]);
-    try {
-      await axios.post("http://127.0.0.1:5000/api/performers", {
-        name: performer,
-      });
-      alert("Performer added successfully!");
-    } catch (error) {
-      console.error("Error adding performer:", error);
-      alert("Error adding performer");
-    }
   };
 
   const handleSubmit = async (e) => {
@@ -140,7 +44,7 @@ const ContractUploadForm = () => {
 
     try {
       await axios.post(
-        `http://127.0.0.1:5000/${formData.organisation}/add`,
+        `http://127.0.0.1:5000/api/${formData.organisation}/add`,
         formDataToSubmit,
         {
           headers: {
@@ -172,12 +76,6 @@ const ContractUploadForm = () => {
       handleInputChange={handleInputChange}
       handleSubmit={handleSubmit}
       formData={formData}
-      handleCounterpartyChange={handleCounterpartyChange}
-      handleCounterpartySelect={handleCounterpartySelect}
-      handlePerformersChange={handlePerformersChange}
-      handlePerformerSelect={handlePerformerSelect}
-      counterpartySuggestions={counterpartySuggestions}
-      performerSuggestions={performerSuggestions}
     />
   );
 };

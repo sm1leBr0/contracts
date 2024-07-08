@@ -8,98 +8,35 @@ const validateTable = (table) => {
   return validTables.includes(table);
 };
 
-// Get counterparty suggestions
-exports.getCounterpartySuggestions = async (req, res) => {
-  const { query } = req.query;
-
-  // Перевірка наявності параметра query
-  if (!query) {
-    return res.status(400).json({ error: "Query parameter is missing" });
-  }
-
-  try {
-    // Логування параметра для перевірки
-    console.log("Query parameter:", query);
-
-    // Запит до бази даних
-    const result = await pool.query(
-      `SELECT name FROM counterparty WHERE name ILIKE $1`,
-      [`%${query}%`]
+const getOrInsertCounterparty = async (counterparty) => {
+  const result = await pool.query(
+    "INSERT INTO counterparty (name) VALUES ($1) ON CONFLICT (name) DO NOTHING RETURNING id",
+    [counterparty]
+  );
+  if (result.rows.length > 0) {
+    return result.rows[0].id;
+  } else {
+    const selectResult = await pool.query(
+      "SELECT id FROM counterparty WHERE name = $1",
+      [counterparty]
     );
-
-    // Логування результатів запиту для перевірки
-    console.log("Query result:", result.rows);
-
-    // Перевірка результатів запиту
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: "No suggestions found" });
-    }
-
-    // Відповідь з результатами
-    res.json(result.rows.map((row) => row.name));
-  } catch (err) {
-    console.error("Database query error:", err.message);
-    res.status(500).json({ error: "Internal Server Error" });
+    return selectResult.rows[0].id;
   }
 };
 
-// Add a counterparty
-exports.addCounterparty = async (req, res) => {
-  const { name } = req.body;
-  try {
-    const result = await pool.query(
-      `INSERT INTO counterparty (name) VALUES ($1) ON CONFLICT (name) DO NOTHING RETURNING id`,
-      [name]
+const getOrInsertPerformer = async (performer) => {
+  const result = await pool.query(
+    "INSERT INTO performers (name) VALUES ($1) ON CONFLICT (name) DO NOTHING RETURNING id",
+    [performer]
+  );
+  if (result.rows.length > 0) {
+    return result.rows[0].id;
+  } else {
+    const selectResult = await pool.query(
+      "SELECT id FROM performers WHERE name = $1",
+      [performer]
     );
-
-    if (result.rows.length > 0) {
-      res.status(201).json({ id: result.rows[0].id });
-    } else {
-      const selectResult = await pool.query(
-        `SELECT id FROM counterparty WHERE name = $1`,
-        [name]
-      );
-      res.status(200).json({ id: selectResult.rows[0].id });
-    }
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
-// Get performer suggestions
-exports.getPerformerSuggestions = async (req, res) => {
-  const { query } = req.query;
-  try {
-    const result = await pool.query(
-      `SELECT name FROM performers WHERE name ILIKE $1`,
-      [`%${query}%`]
-    );
-    res.json(result.rows.map((row) => row.name));
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
-// Add a performer
-exports.addPerformer = async (req, res) => {
-  const { name } = req.body;
-  try {
-    const result = await pool.query(
-      `INSERT INTO performers (name) VALUES ($1) ON CONFLICT (name) DO NOTHING RETURNING id`,
-      [name]
-    );
-
-    if (result.rows.length > 0) {
-      res.status(201).json({ id: result.rows[0].id });
-    } else {
-      const selectResult = await pool.query(
-        `SELECT id FROM performers WHERE name = $1`,
-        [name]
-      );
-      res.status(200).json({ id: selectResult.rows[0].id });
-    }
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    return selectResult.rows[0].id;
   }
 };
 
@@ -184,7 +121,7 @@ exports.getContracts = async (req, res) => {
         ${table}.id, 
         ${table}.title, 
         ${table}.description, 
-        counterparties.name AS counterparty, 
+        counterparty.name AS counterparty, 
         ${table}.number, 
         TO_CHAR(${table}.date, 'YYYY.MM.DD') AS date, 
         TO_CHAR(${table}.end_date, 'YYYY.MM.DD') AS end_date,
@@ -193,7 +130,7 @@ exports.getContracts = async (req, res) => {
         ${table}.file_path, 
         TO_CHAR(${table}.created_at, 'YYYY-MM-DD') AS created_at 
       FROM ${table}
-      LEFT JOIN counterparties ON ${table}.counterparty_id = counterparties.id
+      LEFT JOIN counterparty ON ${table}.counterparty_id = counterparty.id
       LEFT JOIN performers ON ${table}.performer_id = performers.id
     `;
     const values = [];
@@ -233,7 +170,7 @@ exports.getContractById = async (req, res) => {
          ${table}.id, 
          ${table}.title, 
          ${table}.description, 
-         counterparties.name AS counterparty, 
+         counterparty.name AS counterparty, 
          ${table}.number, 
          TO_CHAR(${table}.date, 'YYYY.MM.DD') AS date, 
          TO_CHAR(${table}.end_date, 'YYYY.MM.DD') AS end_date,
@@ -242,7 +179,7 @@ exports.getContractById = async (req, res) => {
          ${table}.file_path, 
          TO_CHAR(${table}.created_at, 'YYYY.MM.DD') AS created_at 
       FROM ${table}
-      LEFT JOIN counterparties ON ${table}.counterparty_id = counterparties.id
+      LEFT JOIN counterparty ON ${table}.counterparty_id = counterparty.id
       LEFT JOIN performers ON ${table}.performer_id = performers.id
       WHERE ${table}.id = $1`,
       [id]
@@ -281,15 +218,20 @@ exports.deleteContract = async (req, res) => {
     if (deletedContract.rows.length === 0) {
       return res.status(404).json({ error: "Contract not found" });
     }
-    fs.unlink(filePath, (err) => {
-      if (err) {
-        console.error("Error deleting file", err);
-        return res
-          .status(500)
-          .json({ error: "Failed to delete file from server" });
-      }
-      console.log("File deleted successfully");
-    });
+    if (fs.existsSync(filePath)) {
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error("Error deleting file", err);
+          return res
+            .status(500)
+            .json({ error: "Failed to delete file from server" });
+        }
+        console.log("File deleted successfully");
+      });
+    } else {
+      console.log("File not found, skipping deletion");
+    }
+
     res.status(200).json({ message: "Contract deleted successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
