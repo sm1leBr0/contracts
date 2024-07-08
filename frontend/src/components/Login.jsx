@@ -18,6 +18,7 @@ const Login = ({ setAuth }) => {
           password,
         }
       );
+      localStorage.setItem("authToken", response.data.token);
       setAuth(response.data.token);
       navigate("/upload");
     } catch (err) {

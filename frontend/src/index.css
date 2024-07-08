@@ -19,3 +19,35 @@
   border-color: #2563eb;
   box-shadow: 0 0 0 0.2rem rgba(38, 132, 255, 0.25);
 }
+
+.table-container {
+  display: block; /* Ensures proper layout for the table */
+  overflow: hidden; /* Hides scrollbars on the container */
+}
+
+.table-wrapper {
+  max-height: 800px; /* Set the height for the scrollable tbody */
+  overflow-y: auto; /* Only vertical scrolling */
+}
+
+.table thead {
+  position: sticky; /* Keeps the header in place */
+  top: 0; /* Aligns it to the top */
+  background-color: gray; /* Background color for better visibility */
+  z-index: 10; /* Ensures the header stays above the tbody */
+}
+
+.table {
+  width: 100%; /* Ensures the table takes the full width of the container */
+  border-collapse: collapse; /* Ensures borders are handled properly */
+}
+
+.table th,
+.table td {
+  padding: 8px 12px; /* Adjust as needed for padding */
+  text-align: left; /* Text alignment */
+}
+
+.active-link {
+  color: #ffd700; /* Highlight color */
+}

@@ -139,7 +139,7 @@ exports.getContracts = async (req, res) => {
       baseQuery += `
         WHERE ${table}.title ILIKE $1 OR 
               ${table}.description ILIKE $1 OR 
-              counterparties.name ILIKE $1 OR 
+              counterparty.name ILIKE $1 OR 
               ${table}.number ILIKE $1 OR 
               TO_CHAR(${table}.date, 'YYYY.MM.DD') ILIKE $1 OR 
               TO_CHAR(${table}.end_date, 'YYYY.MM.DD') ILIKE $1 OR 

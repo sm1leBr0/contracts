@@ -47,7 +47,7 @@ const ContractDetails = ({ auth }) => {
     if (removeConfirm) {
       try {
         await axios.delete(`http://localhost:5000/api/${org}/${id}`);
-        navigate("/contracts");
+        navigate("/");
       } catch (error) {
         console.error("Error deleting contract:", error);
       }

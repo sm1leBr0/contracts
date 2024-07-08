@@ -8,7 +8,7 @@ import Login from "./components/Login";
 
 function App() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [auth, setAuth] = useState(null);
+  const [auth, setAuth] = useState(localStorage.getItem("authToken"));
   const [organisation, setOrganisation] = useState("protect");
 
   const handleSearchChange = (e) => {
@@ -20,27 +20,36 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen flex flex-col">
       <header className="bg-[#393E46] shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-row justify-between items-center">
           <h1 className="text-xl text-white font-semibold">Сайт договорів</h1>
           <nav className="flex justify-center text-[#F7F7F7] text-xl">
             <NavLink
               to="/protect"
-              className="mx-4"
+              className={({ isActive }) =>
+                `mx-4 ${isActive ? "active-link" : ""}`
+              }
               onClick={handleOrganisationChange("protect")}
             >
               ТОВ "Протект Інжиніринг"
             </NavLink>
             <NavLink
               to="/aig"
-              className="mx-4"
+              className={({ isActive }) =>
+                `mx-4 ${isActive ? "active-link" : ""}`
+              }
               onClick={handleOrganisationChange("aig")}
             >
               ТОВ "Автомобільна Інжинірінгова Група"
             </NavLink>
             {auth && (
-              <NavLink to="/upload" className="mx-4">
+              <NavLink
+                to="/upload"
+                className={({ isActive }) =>
+                  `mx-4 ${isActive ? "active-link" : ""}`
+                }
+              >
                 Upload
               </NavLink>
             )}
@@ -54,7 +63,7 @@ function App() {
           />
         </div>
       </header>
-      <main className="flex flex-col justify-center mx-auto">
+      <main className="flex flex-col justify-center mx-auto flex-1">
         <Routes>
           <Route
             path="/protect"
