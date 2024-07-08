@@ -50,15 +50,15 @@ const ContractsList = ({ searchTerm, org }) => {
         <TiArrowSortedUp
           className={`text-lg ${
             sortConfig.key === key && sortConfig.direction === "asc"
-              ? "text-blue-500"
-              : "text-gray-500"
+              ? "text-blue-600" /* Updated sort icon color */
+              : "text-gray-400"
           }`}
         />
         <TiArrowSortedDown
           className={`text-lg ${
             sortConfig.key === key && sortConfig.direction === "desc"
-              ? "text-blue-500"
-              : "text-gray-500"
+              ? "text-blue-600" /* Updated sort icon color */
+              : "text-gray-400"
           }`}
         />
       </span>
@@ -66,111 +66,97 @@ const ContractsList = ({ searchTerm, org }) => {
   };
 
   return (
-    <div className="max-w-full h-full mx-auto flex flex-col flex-1">
+    <div className=" max-w-7xl h-full mx-auto flex flex-col flex-1 text-gray-800">
       <h2 className="text-center py-4 text-3xl font-bold">
         Список договорів{" "}
         {org === "protect"
           ? ` ТОВ "Протект Інжиніринг"`
           : `ТОВ "Автомобільна Інжинірінгова Група"`}
       </h2>
-
-      <div className="inline-block min-w-full align-middle h-full">
-        <div className="overflow-y-auto h-[800px]">
-          <table className="divide-gray-200 table-fixed">
-            <thead className="bg-gray-400 text-white text-left cursor-pointer">
-              <tr className="w-[1280px]">
-                <th
-                  className="px-4 py-2 w-[250px] cursor-pointer"
-                  onClick={() => handleSort("title")}
-                >
-                  <div className="flex items-center">
-                    Назва {getSortIcon("title")}
-                  </div>
-                </th>
-                <th
-                  className="px-4 py-2 w-[20px] cursor-pointer"
-                  onClick={() => handleSort("id")}
-                >
-                  <div className="flex items-center">
-                    ID {getSortIcon("id")}
-                  </div>
-                </th>
-                <th
-                  className="px-4 py-2 w-[150px]"
-                  onClick={() => handleSort("counterparty")}
-                >
-                  <div className="flex items-center">
-                    Контрагент {getSortIcon("counterparty")}
-                  </div>
-                </th>
-                <th
-                  className="px-4 py-2 w-[50px]"
-                  onClick={() => handleSort("number")}
-                >
-                  <div className="flex items-center">
-                    Номер договору {getSortIcon("number")}
-                  </div>
-                </th>
-                <th
-                  className="px-4 py-2 w-[100px]"
-                  onClick={() => handleSort("date")}
-                >
-                  <div className="flex items-center">
-                    Дата {getSortIcon("date")}
-                  </div>
-                </th>
-                <th
-                  className="px-4 py-2 w-[100px]"
-                  onClick={() => handleSort("end_date")}
-                >
-                  <div className="flex items-center">
-                    Дата закінчення {getSortIcon("end_date")}
-                  </div>
-                </th>
-                <th
-                  className="px-4 py-2 w-[150px]"
-                  onClick={() => handleSort("performers")}
-                >
-                  <div className="flex items-center">
-                    Виконавець {getSortIcon("performers")}
-                  </div>
-                </th>
-                <th
-                  className="px-4 py-2 w-[150px]"
-                  onClick={() => handleSort("description")}
-                >
-                  <div className="flex items-center">
-                    Примітка {getSortIcon("description")}
-                  </div>
-                </th>
-                <th className="px-4 py-2 w-[150px]"></th>
+      <div className="relative flex flex-1 max-h-[810px] overflow-y-auto bg-gray-100 rounded-lg shadow-lg">
+        <table className="table-fixed w-full text-gray-900">
+          <thead className="text-left bg-gray-800 text-gray-100 cursor-pointer  select-none sticky top-0 z-10">
+            <tr>
+              <th className="p-2 w-[140px]" onClick={() => handleSort("title")}>
+                <div className="flex items-center">
+                  Назва {getSortIcon("title")}
+                </div>
+              </th>
+              <th className="p-2 w-[40px]" onClick={() => handleSort("id")}>
+                <div className="flex items-center">ID {getSortIcon("id")}</div>
+              </th>
+              <th
+                className="p-2  w-[120px]"
+                onClick={() => handleSort("counterparty")}
+              >
+                <div className="flex items-center">
+                  Контрагент {getSortIcon("counterparty")}
+                </div>
+              </th>
+              <th
+                className="p-2  w-[80px]"
+                onClick={() => handleSort("number")}
+              >
+                <div className="flex items-center">
+                  Номер {getSortIcon("number")}
+                </div>
+              </th>
+              <th className="p-2  w-[100px]" onClick={() => handleSort("date")}>
+                <div className="flex items-center">
+                  Дата {getSortIcon("date")}
+                </div>
+              </th>
+              <th
+                className="p-2  w-[100px]"
+                onClick={() => handleSort("end_date")}
+              >
+                <div className="flex items-center">
+                  Дата закінчення {getSortIcon("end_date")}
+                </div>
+              </th>
+              <th
+                className="p-2  w-[120px]"
+                onClick={() => handleSort("performers")}
+              >
+                <div className="flex items-center">
+                  Виконавець {getSortIcon("performers")}
+                </div>
+              </th>
+              <th
+                className="p-2  w-[100px]"
+                onClick={() => handleSort("description")}
+              >
+                <div className="flex items-center">
+                  Примітка {getSortIcon("description")}
+                </div>
+              </th>
+              <th className="p-2  w-[100px]"></th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-300">
+            {sortedData.map((item) => (
+              <tr key={item.id} className="hover:bg-gray-200">
+                <td className="p-2">{item.title}</td>
+                <td className="p-2">{item.id}</td>
+                <td className="p-2">{item.counterparty}</td>
+                <td className="p-2">{item.number}</td>
+                <td className="p-2">{item.date}</td>
+                <td className="p-2">{item.end_date}</td>
+                <td className="p-2">{item.performers}</td>
+                <td className="p-2">
+                  {item.description.toString().slice(0, 10) + "..."}
+                </td>
+                <td className="px-4 py-2 text-center">
+                  <Link to={`/${org}/${item.id}`}>
+                    <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                      Детальніше
+                    </button>
+                  </Link>
+                </td>
               </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {sortedData.map((item) => (
-                <tr key={item.id} className="hover:bg-gray-100 text-wrap">
-                  <td className="px-4 py-2">{item.title}</td>
-                  <td className="px-4 py-2">{item.id}</td>
-                  <td className="px-4 py-2">{item.counterparty}</td>
-                  <td className="px-4 py-2">{item.number}</td>
-                  <td className="px-4 py-2">{item.date}</td>
-                  <td className="px-4 py-2">{item.end_date}</td>
-                  <td className="px-4 py-2">{item.performers}</td>
-                  <td className="px-4 py-2">
-                    {item.description.toString().slice(0, 10) + "..."}
-                  </td>
-                  <td className="px-4 py-2 text-center">
-                    <Link to={`/${org}/${item.id}`}>
-                      <button className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg">
-                        Детальніше
-                      </button>
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

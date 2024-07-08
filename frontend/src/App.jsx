@@ -5,6 +5,7 @@ import UpdateContractForm from "./components/UpdateContractForm";
 import { Routes, Route, NavLink, Navigate } from "react-router-dom";
 import { useState } from "react";
 import Login from "./components/Login";
+import { RiFilePaper2Line } from "react-icons/ri";
 
 function App() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -21,10 +22,12 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="bg-[#393E46] shadow-sm">
+      <header className="bg-[#1E1E1E] shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-row justify-between items-center">
-          <h1 className="text-xl text-white font-semibold">Сайт договорів</h1>
-          <nav className="flex justify-center text-[#F7F7F7] text-xl">
+          <h1 className="text-xl text-white font-semibold flex items-center gap-2">
+            <RiFilePaper2Line /> Сайт договорів
+          </h1>
+          <nav className="flex justify-center text-[#9e9e9e] text-xl">
             <NavLink
               to="/protect"
               className={({ isActive }) =>
@@ -63,7 +66,7 @@ function App() {
           />
         </div>
       </header>
-      <main className="flex flex-col justify-center mx-auto flex-1">
+      <main className="flex flex-col justify-center mx-auto flex-1 w-full">
         <Routes>
           <Route
             path="/protect"
