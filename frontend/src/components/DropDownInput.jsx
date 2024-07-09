@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-const DropDownInput = ({ onSelect, type }) => {
-  const [query, setQuery] = useState("");
+const DropDownInput = ({ onSelect, type, defaultValue = "" }) => {
+  const [query, setQuery] = useState(defaultValue);
   const [suggestions, setSuggestions] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
+  useEffect(() => {
+    setQuery(defaultValue);
+  }, [defaultValue]);
   useEffect(() => {
     const fetchSuggestions = async () => {
       if (query.length > 0) {

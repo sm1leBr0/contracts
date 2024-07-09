@@ -27,7 +27,7 @@ const Form = ({
   };
 
   return (
-    <div className="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md">
+    <div className="max-w-5xl mx-auto bg-white p-6 rounded-lg shadow-md">
       <h2 className="text-xl font-semibold mb-4 text-center">
         {isUpdate ? "Update Contract" : "Upload Contract"}
       </h2>
@@ -65,6 +65,7 @@ const Form = ({
               })
             }
             type="counterparty"
+            defaultValue={counterparty}
           />
         </div>
         <div className="mb-4">
@@ -76,6 +77,7 @@ const Form = ({
               })
             }
             type="performer"
+            defaultValue={performers}
           />
         </div>
         <div className="mb-4">
