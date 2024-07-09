@@ -1,4 +1,5 @@
 import React from "react";
+import DropDownInput from "./DropDownInput";
 
 const Form = ({
   handleSubmit,
@@ -17,6 +18,13 @@ const Form = ({
     endDate,
     organisation,
   } = formData;
+
+  const handlePerformerSelect = (performer) => {
+    // Update the performers field with the selected performer's name
+    handleInputChange({
+      target: { name: "performers", value: performer.name },
+    });
+  };
 
   return (
     <div className="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md">
@@ -50,26 +58,24 @@ const Form = ({
         </div>
         <div className="mb-4">
           <label htmlFor="counterparty">Counterparty</label>
-          <input
-            type="text"
-            id="counterparty"
-            name="counterparty"
-            value={counterparty}
-            onChange={handleInputChange}
-            required
-            className="form-element"
+          <DropDownInput
+            onSelect={(selected) =>
+              handleInputChange({
+                target: { name: "counterparty", value: selected.name },
+              })
+            }
+            type="counterparty"
           />
         </div>
         <div className="mb-4">
           <label htmlFor="performers">Performers</label>
-          <input
-            type="text"
-            id="performers"
-            name="performers"
-            value={performers}
-            onChange={handleInputChange}
-            required
-            className="form-element"
+          <DropDownInput
+            onSelect={(selected) =>
+              handleInputChange({
+                target: { name: "performers", value: selected.name },
+              })
+            }
+            type="performer"
           />
         </div>
         <div className="mb-4">

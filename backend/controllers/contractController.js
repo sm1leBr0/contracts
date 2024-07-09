@@ -8,6 +8,46 @@ const validateTable = (table) => {
   return validTables.includes(table);
 };
 
+// Search for counterparty
+exports.searchCounterparty = async (req, res) => {
+  const { table } = req.params;
+  if (!validateTable(table)) {
+    return res.status(400).json({ error: "Invalid table name" });
+  }
+
+  const { query } = req.query;
+  try {
+    const results = await pool.query(
+      "SELECT id, name FROM counterparty WHERE name ILIKE $1",
+      [`%${query}%`]
+    );
+    res.json(results.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+};
+
+// Search for performer
+exports.searchPerformer = async (req, res) => {
+  const { table } = req.params;
+  if (!validateTable(table)) {
+    return res.status(400).json({ error: "Invalid table name" });
+  }
+
+  const { query } = req.query;
+  try {
+    const results = await pool.query(
+      "SELECT id, name FROM performers WHERE name ILIKE $1",
+      [`%${query}%`]
+    );
+    res.json(results.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+};
+
 const getOrInsertCounterparty = async (counterparty) => {
   const result = await pool.query(
     "INSERT INTO counterparty (name) VALUES ($1) ON CONFLICT (name) DO NOTHING RETURNING id",
@@ -123,8 +163,8 @@ exports.getContracts = async (req, res) => {
         ${table}.description, 
         counterparty.name AS counterparty, 
         ${table}.number, 
-        TO_CHAR(${table}.date, 'YYYY.MM.DD') AS date, 
-        TO_CHAR(${table}.end_date, 'YYYY.MM.DD') AS end_date,
+        TO_CHAR(${table}.date, 'YYYY-MM-DD') AS date, 
+        TO_CHAR(${table}.end_date, 'YYYY-MM-DD') AS end_date,
         ${table}.scope, 
         performers.name AS performers, 
         ${table}.file_path, 
@@ -141,8 +181,8 @@ exports.getContracts = async (req, res) => {
               ${table}.description ILIKE $1 OR 
               counterparty.name ILIKE $1 OR 
               ${table}.number ILIKE $1 OR 
-              TO_CHAR(${table}.date, 'YYYY.MM.DD') ILIKE $1 OR 
-              TO_CHAR(${table}.end_date, 'YYYY.MM.DD') ILIKE $1 OR 
+              TO_CHAR(${table}.date, 'YYYY-MM-DD') ILIKE $1 OR 
+              TO_CHAR(${table}.end_date, 'YYYY-MM-DD') ILIKE $1 OR 
               ${table}.scope ILIKE $1 OR 
               performers.name ILIKE $1
       `;
@@ -172,8 +212,8 @@ exports.getContractById = async (req, res) => {
          ${table}.description, 
          counterparty.name AS counterparty, 
          ${table}.number, 
-         TO_CHAR(${table}.date, 'YYYY.MM.DD') AS date, 
-         TO_CHAR(${table}.end_date, 'YYYY.MM.DD') AS end_date,
+         TO_CHAR(${table}.date, 'YYYY-MM-DD') AS date, 
+         TO_CHAR(${table}.end_date, 'YYYY-MM-DD') AS end_date,
          ${table}.scope, 
          performers.name AS performers, 
          ${table}.file_path, 

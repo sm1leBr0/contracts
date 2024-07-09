@@ -73,9 +73,9 @@ const ContractsList = ({ searchTerm, org }) => {
           ? ` ТОВ "Протект Інжиніринг"`
           : `ТОВ "Автомобільна Інжинірінгова Група"`}
       </h2>
-      <div className="relative flex flex-1 max-h-[810px] overflow-y-auto bg-gray-100 rounded-lg shadow-lg">
+      <div className="relative flex max-h-[810px] overflow-y-auto bg-gray-100 rounded-lg shadow-lg">
         <table className="table-fixed w-full text-gray-900">
-          <thead className="text-left bg-gray-800 text-gray-100 cursor-pointer  select-none sticky top-0 z-10">
+          <thead className="text-left bg-gray-800 text-gray-100 cursor-pointer select-none sticky top-0 z-10">
             <tr>
               <th className="p-2 w-[140px]" onClick={() => handleSort("title")}>
                 <div className="flex items-center">

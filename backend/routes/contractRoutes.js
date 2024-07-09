@@ -9,6 +9,8 @@ const {
   updateContract,
   deleteContract,
   downloadContractFile,
+  searchCounterparty,
+  searchPerformer,
 } = require("../controllers/contractController");
 
 // Route for adding a contract with file upload
@@ -23,5 +25,9 @@ router.put("/:table/update/:id", upload.single("file"), updateContract);
 router.delete("/:table/:id", deleteContract);
 // Route for downloading a contract file
 router.get("/:table/download/:id", downloadContractFile);
+// Route for searching counterparty
+router.get("/:table/counterparty/search", searchCounterparty);
+// Route for searching performer
+router.get("/:table/performer/search", searchPerformer);
 
 module.exports = router;
