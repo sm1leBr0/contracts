@@ -2,10 +2,23 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const path = require("path");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 const contractRoutes = require("./routes/contractRoutes");
 
 dotenv.config();
 const app = express();
+
+app.use(helmet());
+
+// Define rate limiter
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+});
+
+// Apply the rate limiting middleware to all requests
+app.use(limiter);
 
 app.use(cors());
 app.use(express.json());

@@ -68,7 +68,7 @@ const DropDownInput = ({ onSelect, type, defaultValue = "" }) => {
     if (query && !suggestions.some((s) => s.name === query)) {
       onSelect({ name: query });
     }
-  }, [query, suggestions, onSelect]);
+  }, [query, suggestions]);
 
   return (
     <div className="relative autocomplete-container">

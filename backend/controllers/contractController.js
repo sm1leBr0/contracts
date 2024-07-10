@@ -337,10 +337,26 @@ exports.updateContract = async (req, res) => {
   }
 
   // Handle file upload if included in the request
+  let oldFilePath = "";
   if (req.file) {
+    const oldContract = await pool.query(
+      `SELECT file_path FROM ${table} WHERE id = $1`,
+      [id]
+    );
+    if (oldContract.rows.length > 0) {
+      oldFilePath = oldContract.rows[0].file_path;
+    }
+
     const file_path = req.file.path;
     fieldsToUpdate.file_path = file_path;
     updateParams.push(file_path);
+  }
+  if (oldFilePath) {
+    fs.unlink(oldFilePath, (err) => {
+      if (err) {
+        console.error(`Error removing old file: ${err.message}`);
+      }
+    });
   }
 
   if (Object.keys(fieldsToUpdate).length === 0) {
