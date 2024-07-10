@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const upload = require("../config/multerConfig");
-const { body, param, query, validationResult } = require("express-validator");
 
 const {
   getContracts,
@@ -14,86 +13,21 @@ const {
   searchPerformer,
 } = require("../controllers/contractController");
 
-// Middleware to handle validation results
-const validate = (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-  next();
-};
-
 // Route for adding a contract with file upload
-router.post(
-  "/:table/add",
-  [
-    param("table").trim().escape(),
-    upload.single("file"),
-    body("contractData").trim().escape(),
-  ],
-  validate,
-  addContract
-);
-
+router.post("/:table/add", upload.single("file"), addContract);
 // Route for fetching all contracts
-router.get(
-  "/:table/contracts",
-  [param("table").trim().escape()],
-  validate,
-  getContracts
-);
-
+router.get("/:table/contracts", getContracts);
 // Route for fetching a specific contract by ID
-router.get(
-  "/:table/:id",
-  [param("table").trim().escape(), param("id").isInt().toInt()],
-  validate,
-  getContractById
-);
-
+router.get("/:table/:id", getContractById);
 // Route for updating a contract
-router.put(
-  "/:table/update/:id",
-  [
-    param("table").trim().escape(),
-    param("id").isInt().toInt(),
-    upload.single("file"),
-    body("contractData").trim().escape(),
-  ],
-  validate,
-  updateContract
-);
-
+router.put("/:table/update/:id", upload.single("file"), updateContract);
 // Route for deleting a contract
-router.delete(
-  "/:table/:id",
-  [param("table").trim().escape(), param("id").isInt().toInt()],
-  validate,
-  deleteContract
-);
-
+router.delete("/:table/:id", deleteContract);
 // Route for downloading a contract file
-router.get(
-  "/:table/download/:id",
-  [param("table").trim().escape(), param("id").isInt().toInt()],
-  validate,
-  downloadContractFile
-);
-
+router.get("/:table/download/:id", downloadContractFile);
 // Route for searching counterparty
-router.get(
-  "/:table/counterparty/search",
-  [param("table").trim().escape(), query("q").trim().escape()],
-  validate,
-  searchCounterparty
-);
-
+router.get("/:table/counterparty/search", searchCounterparty);
 // Route for searching performer
-router.get(
-  "/:table/performer/search",
-  [param("table").trim().escape(), query("q").trim().escape()],
-  validate,
-  searchPerformer
-);
+router.get("/:table/performer/search", searchPerformer);
 
 module.exports = router;
