@@ -48,7 +48,7 @@ const addContractsToTables = async () => {
   console.log("Starting to add contracts...");
   for (const table of tables) {
     console.log(`Adding contracts to table: ${table}`);
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 10; i++) {
       const contractData = generateContractData();
       console.log(`Adding contract ${i + 1} to ${table}`);
       await addContract(table, contractData);

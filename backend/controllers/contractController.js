@@ -19,7 +19,7 @@ exports.searchCounterparty = async (req, res) => {
   try {
     const results = await pool.query(
       "SELECT id, name FROM counterparty WHERE name ILIKE $1",
-      [`%${query}%`]
+      [`%${query || ""}%`]
     );
     res.json(results.rows);
   } catch (err) {
@@ -39,7 +39,7 @@ exports.searchPerformer = async (req, res) => {
   try {
     const results = await pool.query(
       "SELECT id, name FROM performers WHERE name ILIKE $1",
-      [`%${query}%`]
+      [`%${query || ""}%`]
     );
     res.json(results.rows);
   } catch (err) {
@@ -337,10 +337,26 @@ exports.updateContract = async (req, res) => {
   }
 
   // Handle file upload if included in the request
+  let oldFilePath = "";
   if (req.file) {
+    const oldContract = await pool.query(
+      `SELECT file_path FROM ${table} WHERE id = $1`,
+      [id]
+    );
+    if (oldContract.rows.length > 0) {
+      oldFilePath = oldContract.rows[0].file_path;
+    }
+
     const file_path = req.file.path;
     fieldsToUpdate.file_path = file_path;
     updateParams.push(file_path);
+  }
+  if (oldFilePath) {
+    fs.unlink(oldFilePath, (err) => {
+      if (err) {
+        console.error(`Error removing old file: ${err.message}`);
+      }
+    });
   }
 
   if (Object.keys(fieldsToUpdate).length === 0) {
@@ -368,5 +384,63 @@ exports.updateContract = async (req, res) => {
     res.status(200).json(updateContract.rows[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+};
+
+exports.deletePerformer = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      "DELETE FROM performers WHERE id = $1 RETURNING *",
+      [id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Performer not found" });
+    }
+    res.status(200).json({ message: "Performer deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Function to delete a counterparty by ID
+exports.deleteCounterparty = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      "DELETE FROM counterparty WHERE id = $1 RETURNING *",
+      [id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Counterparty not found" });
+    }
+    res.status(200).json({ message: "Counterparty deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.addPerformer = async (req, res) => {
+  const { name } = req.body;
+
+  try {
+    const performerId = await getOrInsertPerformer(name);
+    res.json({ id: performerId, name });
+  } catch (error) {
+    console.error("Error adding performer:", error);
+    res.status(500).json({ error: "Server Error" });
+  }
+};
+
+// Insert a new counterparty
+exports.addCounterparty = async (req, res) => {
+  const { name } = req.body;
+
+  try {
+    const counterpartyId = await getOrInsertCounterparty(name);
+    res.json({ id: counterpartyId, name });
+  } catch (error) {
+    console.error("Error adding counterparty:", error);
+    res.status(500).json({ error: "Server Error" });
   }
 };
