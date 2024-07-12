@@ -7,6 +7,7 @@ import { useState } from "react";
 import Login from "./components/Login";
 import { RiFilePaper2Line } from "react-icons/ri";
 import DropDownInput from "./components/DropDownInput";
+import AdminPanel from "./components/AdminPanel";
 
 function App() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -49,12 +50,12 @@ function App() {
             </NavLink>
             {auth && (
               <NavLink
-                to="/upload"
+                to="/admin"
                 className={({ isActive }) =>
                   `mx-4 ${isActive ? "active-link" : ""}`
                 }
               >
-                Upload
+                AdminPanel
               </NavLink>
             )}
           </nav>
@@ -84,6 +85,12 @@ function App() {
           <Route
             path="/upload"
             element={auth ? <ContractUploadForm /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/admin"
+            element={
+              auth ? <AdminPanel auth={auth} /> : <Navigate to="/login" />
+            }
           />
           <Route path="/:org/:id" element={<ContractDetails auth={auth} />} />
           <Route path="/login" element={<Login setAuth={setAuth} />} />

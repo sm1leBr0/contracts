@@ -28,7 +28,7 @@ const Form = ({
 
   return (
     <div className="w-[500px] mx-auto">
-      <div className=" bg-white p-5 rounded-lg shadow-md">
+      <div className=" bg-gray-300 p-5 rounded-lg shadow-md">
         <h2 className="text-xl font-semibold mb-4 text-center">
           {isUpdate ? "Update Contract" : "Upload Contract"}
         </h2>
