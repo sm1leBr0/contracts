@@ -2,10 +2,11 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import Form from "./Form";
+import axiosInstance from "../axiosInstance";
 import { transliterateFilename } from "../transliterationRules";
 
-const UpdateContractForm = ({ org }) => {
-  const { id } = useParams();
+const UpdateContractForm = () => {
+  const { id, org } = useParams();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
@@ -20,9 +21,9 @@ const UpdateContractForm = ({ org }) => {
   });
 
   useEffect(() => {
-    axios
-      .get(`http://127.0.0.1:5000/api/${org}/${id}`)
-      .then((res) => {
+    const fetchContract = async () => {
+      try {
+        const res = await axios.get(`http://127.0.0.1:5000/api/${org}/${id}`);
         const contract = res.data;
         setFormData({
           title: contract.title,
@@ -34,10 +35,12 @@ const UpdateContractForm = ({ org }) => {
           performers: contract.performers,
           organisation: org,
         });
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("Error fetching contract:", error);
-      });
+      }
+    };
+
+    fetchContract();
   }, [id, org]);
 
   const handleFileChange = (e) => {
