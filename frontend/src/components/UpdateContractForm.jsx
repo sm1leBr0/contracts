@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import Form from "./Form";
+import { transliterateFilename } from "../transliterationRules";
 
 const UpdateContractForm = ({ org }) => {
   const { id } = useParams();
@@ -40,7 +41,17 @@ const UpdateContractForm = ({ org }) => {
   }, [id, org]);
 
   const handleFileChange = (e) => {
-    setFormData({ ...formData, file: e.target.files[0] });
+    const file = e.target.files[0];
+    if (file) {
+      // Транслітеруйте ім'я файлу
+      const transliteratedFileName = transliterateFilename(file.name);
+      // Створіть новий файл з транслітерованим ім'ям
+      const newFile = new File([file], transliteratedFileName, {
+        type: file.type,
+      });
+      setFormData({ ...formData, file: newFile });
+      console.log(newFile); // Перевірте ім'я файлу
+    }
   };
 
   const handleInputChange = (e) => {

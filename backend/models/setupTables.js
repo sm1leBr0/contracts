@@ -2,14 +2,15 @@ const pool = require("../config/db");
 
 const createTables = async () => {
   try {
+    await pool.query(`DROP TABLE IF EXISTS counterparty CASCADE`);
     // Create counterparties table
     await pool.query(`
-      CREATE TABLE IF NOT EXISTS counterparties (
+      CREATE TABLE IF NOT EXISTS counterparty (
         id SERIAL PRIMARY KEY,
         name VARCHAR(100) NOT NULL UNIQUE
       )
     `);
-
+    await pool.query(`DROP TABLE IF EXISTS performers CASCADE`);
     // Create performers table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS performers (
@@ -17,17 +18,14 @@ const createTables = async () => {
         name VARCHAR(100) NOT NULL UNIQUE
       )
     `);
-
-    // Drop existing protect table
     await pool.query(`DROP TABLE IF EXISTS protect`);
-
     // Create updated protect table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS protect (
         id SERIAL PRIMARY KEY,
         title VARCHAR(100) NOT NULL,
         description TEXT,
-        counterparty_id INTEGER REFERENCES counterparties(id),
+        counterparty_id INTEGER REFERENCES counterparty(id),
         number VARCHAR(50) NOT NULL,
         date DATE,
         end_date DATE,
@@ -47,7 +45,7 @@ const createTables = async () => {
         id SERIAL PRIMARY KEY,
         title VARCHAR(100) NOT NULL,
         description TEXT,
-        counterparty_id INTEGER REFERENCES counterparties(id),
+        counterparty_id INTEGER REFERENCES counterparty(id),
         number VARCHAR(50) NOT NULL,
         date DATE,
         end_date DATE,

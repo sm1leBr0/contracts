@@ -8,40 +8,73 @@ const validateTable = (table) => {
   return validTables.includes(table);
 };
 
-const getOrInsertCounterparty = async (name) => {
-  const result = await pool.query(
-    `INSERT INTO counterparties (name) VALUES ($1)
-     ON CONFLICT (name) DO NOTHING
-     RETURNING id`,
-    [name]
-  );
+// Search for counterparty
+exports.searchCounterparty = async (req, res) => {
+  const { table } = req.params;
+  if (!validateTable(table)) {
+    return res.status(400).json({ error: "Invalid table name" });
+  }
 
+  const { query } = req.query;
+  try {
+    const results = await pool.query(
+      "SELECT id, name FROM counterparty WHERE name ILIKE $1",
+      [`%${query || ""}%`]
+    );
+    res.json(results.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+};
+
+// Search for performer
+exports.searchPerformer = async (req, res) => {
+  const { table } = req.params;
+  if (!validateTable(table)) {
+    return res.status(400).json({ error: "Invalid table name" });
+  }
+
+  const { query } = req.query;
+  try {
+    const results = await pool.query(
+      "SELECT id, name FROM performers WHERE name ILIKE $1",
+      [`%${query || ""}%`]
+    );
+    res.json(results.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+};
+
+const getOrInsertCounterparty = async (counterparty) => {
+  const result = await pool.query(
+    "INSERT INTO counterparty (name) VALUES ($1) ON CONFLICT (name) DO NOTHING RETURNING id",
+    [counterparty]
+  );
   if (result.rows.length > 0) {
     return result.rows[0].id;
   } else {
     const selectResult = await pool.query(
-      `SELECT id FROM counterparties WHERE name = $1`,
-      [name]
+      "SELECT id FROM counterparty WHERE name = $1",
+      [counterparty]
     );
     return selectResult.rows[0].id;
   }
 };
 
-// Helper function to get or insert a performer and return its ID
-const getOrInsertPerformer = async (name) => {
+const getOrInsertPerformer = async (performer) => {
   const result = await pool.query(
-    `INSERT INTO performers (name) VALUES ($1)
-     ON CONFLICT (name) DO NOTHING
-     RETURNING id`,
-    [name]
+    "INSERT INTO performers (name) VALUES ($1) ON CONFLICT (name) DO NOTHING RETURNING id",
+    [performer]
   );
-
   if (result.rows.length > 0) {
     return result.rows[0].id;
   } else {
     const selectResult = await pool.query(
-      `SELECT id FROM performers WHERE name = $1`,
-      [name]
+      "SELECT id FROM performers WHERE name = $1",
+      [performer]
     );
     return selectResult.rows[0].id;
   }
@@ -128,16 +161,16 @@ exports.getContracts = async (req, res) => {
         ${table}.id, 
         ${table}.title, 
         ${table}.description, 
-        counterparties.name AS counterparty, 
+        counterparty.name AS counterparty, 
         ${table}.number, 
-        TO_CHAR(${table}.date, 'YYYY.MM.DD') AS date, 
-        TO_CHAR(${table}.end_date, 'YYYY.MM.DD') AS end_date,
+        TO_CHAR(${table}.date, 'YYYY-MM-DD') AS date, 
+        TO_CHAR(${table}.end_date, 'YYYY-MM-DD') AS end_date,
         ${table}.scope, 
         performers.name AS performers, 
         ${table}.file_path, 
         TO_CHAR(${table}.created_at, 'YYYY-MM-DD') AS created_at 
       FROM ${table}
-      LEFT JOIN counterparties ON ${table}.counterparty_id = counterparties.id
+      LEFT JOIN counterparty ON ${table}.counterparty_id = counterparty.id
       LEFT JOIN performers ON ${table}.performer_id = performers.id
     `;
     const values = [];
@@ -146,10 +179,10 @@ exports.getContracts = async (req, res) => {
       baseQuery += `
         WHERE ${table}.title ILIKE $1 OR 
               ${table}.description ILIKE $1 OR 
-              counterparties.name ILIKE $1 OR 
+              counterparty.name ILIKE $1 OR 
               ${table}.number ILIKE $1 OR 
-              TO_CHAR(${table}.date, 'YYYY.MM.DD') ILIKE $1 OR 
-              TO_CHAR(${table}.end_date, 'YYYY.MM.DD') ILIKE $1 OR 
+              TO_CHAR(${table}.date, 'YYYY-MM-DD') ILIKE $1 OR 
+              TO_CHAR(${table}.end_date, 'YYYY-MM-DD') ILIKE $1 OR 
               ${table}.scope ILIKE $1 OR 
               performers.name ILIKE $1
       `;
@@ -177,16 +210,16 @@ exports.getContractById = async (req, res) => {
          ${table}.id, 
          ${table}.title, 
          ${table}.description, 
-         counterparties.name AS counterparty, 
+         counterparty.name AS counterparty, 
          ${table}.number, 
-         TO_CHAR(${table}.date, 'YYYY.MM.DD') AS date, 
-         TO_CHAR(${table}.end_date, 'YYYY.MM.DD') AS end_date,
+         TO_CHAR(${table}.date, 'YYYY-MM-DD') AS date, 
+         TO_CHAR(${table}.end_date, 'YYYY-MM-DD') AS end_date,
          ${table}.scope, 
          performers.name AS performers, 
          ${table}.file_path, 
          TO_CHAR(${table}.created_at, 'YYYY.MM.DD') AS created_at 
       FROM ${table}
-      LEFT JOIN counterparties ON ${table}.counterparty_id = counterparties.id
+      LEFT JOIN counterparty ON ${table}.counterparty_id = counterparty.id
       LEFT JOIN performers ON ${table}.performer_id = performers.id
       WHERE ${table}.id = $1`,
       [id]
@@ -225,15 +258,20 @@ exports.deleteContract = async (req, res) => {
     if (deletedContract.rows.length === 0) {
       return res.status(404).json({ error: "Contract not found" });
     }
-    fs.unlink(filePath, (err) => {
-      if (err) {
-        console.error("Error deleting file", err);
-        return res
-          .status(500)
-          .json({ error: "Failed to delete file from server" });
-      }
-      console.log("File deleted successfully");
-    });
+    if (fs.existsSync(filePath)) {
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error("Error deleting file", err);
+          return res
+            .status(500)
+            .json({ error: "Failed to delete file from server" });
+        }
+        console.log("File deleted successfully");
+      });
+    } else {
+      console.log("File not found, skipping deletion");
+    }
+
     res.status(200).json({ message: "Contract deleted successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -299,10 +337,26 @@ exports.updateContract = async (req, res) => {
   }
 
   // Handle file upload if included in the request
+  let oldFilePath = "";
   if (req.file) {
+    const oldContract = await pool.query(
+      `SELECT file_path FROM ${table} WHERE id = $1`,
+      [id]
+    );
+    if (oldContract.rows.length > 0) {
+      oldFilePath = oldContract.rows[0].file_path;
+    }
+
     const file_path = req.file.path;
     fieldsToUpdate.file_path = file_path;
     updateParams.push(file_path);
+  }
+  if (oldFilePath) {
+    fs.unlink(oldFilePath, (err) => {
+      if (err) {
+        console.error(`Error removing old file: ${err.message}`);
+      }
+    });
   }
 
   if (Object.keys(fieldsToUpdate).length === 0) {
@@ -330,5 +384,63 @@ exports.updateContract = async (req, res) => {
     res.status(200).json(updateContract.rows[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+};
+
+exports.deletePerformer = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      "DELETE FROM performers WHERE id = $1 RETURNING *",
+      [id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Performer not found" });
+    }
+    res.status(200).json({ message: "Performer deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Function to delete a counterparty by ID
+exports.deleteCounterparty = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      "DELETE FROM counterparty WHERE id = $1 RETURNING *",
+      [id]
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Counterparty not found" });
+    }
+    res.status(200).json({ message: "Counterparty deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.addPerformer = async (req, res) => {
+  const { name } = req.body;
+
+  try {
+    const performerId = await getOrInsertPerformer(name);
+    res.json({ id: performerId, name });
+  } catch (error) {
+    console.error("Error adding performer:", error);
+    res.status(500).json({ error: "Server Error" });
+  }
+};
+
+// Insert a new counterparty
+exports.addCounterparty = async (req, res) => {
+  const { name } = req.body;
+
+  try {
+    const counterpartyId = await getOrInsertCounterparty(name);
+    res.json({ id: counterpartyId, name });
+  } catch (error) {
+    console.error("Error adding counterparty:", error);
+    res.status(500).json({ error: "Server Error" });
   }
 };
