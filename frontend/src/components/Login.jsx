@@ -20,7 +20,7 @@ const Login = ({ setAuth }) => {
       );
       localStorage.setItem("authToken", response.data.token);
       setAuth(response.data.token);
-      navigate("/upload");
+      navigate("/");
     } catch (err) {
       setError("Invalid credentials");
     }

@@ -6,7 +6,6 @@ import { Routes, Route, NavLink, Navigate } from "react-router-dom";
 import { useState } from "react";
 import Login from "./components/Login";
 import { RiFilePaper2Line } from "react-icons/ri";
-import DropDownInput from "./components/DropDownInput";
 import AdminPanel from "./components/AdminPanel";
 
 function App() {

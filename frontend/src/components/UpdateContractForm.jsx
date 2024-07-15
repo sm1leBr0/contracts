@@ -77,7 +77,7 @@ const UpdateContractForm = ({ org }) => {
     formDataToSubmit.append("performers", formData.performers);
 
     try {
-      await axios.put(
+      await axiosInstance.put(
         `http://127.0.0.1:5000/api/${org}/update/${id}`,
         formDataToSubmit,
         {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Form from "./Form";
+import axiosInstance from "../axiosInstance";
 import { transliterateFilename } from "../transliterationRules";
 
 const ContractUploadForm = () => {
@@ -54,7 +55,7 @@ const ContractUploadForm = () => {
     formDataToSubmit.append("organisation", formData.organisation);
 
     try {
-      await axios.post(
+      await axiosInstance.post(
         `http://127.0.0.1:5000/api/${formData.organisation}/add`,
         formDataToSubmit,
         {

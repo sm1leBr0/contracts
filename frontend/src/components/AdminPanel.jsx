@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import DropDownInput from "./DropDownInput";
 import ContractUploadForm from "./ContractUploadForm";
 import axios from "axios";
+import axiosInstance from "../axiosInstance";
 
 const AdminPanel = ({ auth }) => {
   const [selectedItem, setSelectedItem] = useState(null);
@@ -16,7 +17,7 @@ const AdminPanel = ({ auth }) => {
   const handleDelete = async () => {
     if (selectedItem && itemType) {
       try {
-        await axios.delete(
+        await axiosInstance.delete(
           `http://127.0.0.1:5000/api/aig/${itemType}/${selectedItem.id}`
         );
         setSelectedItem(null);
@@ -36,7 +37,7 @@ const AdminPanel = ({ auth }) => {
   };
   const handleAdd = async (type, query) => {
     try {
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         `http://127.0.0.1:5000/api/aig/${type}/add`,
         { name: query }
       );

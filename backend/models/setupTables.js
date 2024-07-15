@@ -2,6 +2,12 @@ const pool = require("../config/db");
 
 const createTables = async () => {
   try {
+    await pool.query(`CREATE TABLE IF NOT EXISTS users (
+  id SERIAL PRIMARY KEY,
+  username VARCHAR(100) NOT NULL UNIQUE,
+  password VARCHAR(100) NOT NULL
+);`);
+
     await pool.query(`DROP TABLE IF EXISTS protect`);
     // Create updated protect table
     await pool.query(`

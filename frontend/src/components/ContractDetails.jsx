@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import axiosInstance from "../axiosInstance";
 import { useParams, useNavigate } from "react-router-dom";
 
 const ContractDetails = ({ auth }) => {
@@ -46,7 +47,7 @@ const ContractDetails = ({ auth }) => {
 
     if (removeConfirm) {
       try {
-        await axios.delete(`http://localhost:5000/api/${org}/${id}`);
+        await axiosInstance.delete(`http://localhost:5000/api/${org}/${id}`);
         navigate("/");
       } catch (error) {
         console.error("Error deleting contract:", error);
@@ -60,7 +61,7 @@ const ContractDetails = ({ auth }) => {
 
   return (
     <div className="max-w-7xl flex justify-between mx-auto h-full p-6">
-      <div className="max-w-xl bg-gray-200 shadow-lg rounded-lg p-6 mr-6">
+      <div className="max-w-xl p-6 mr-6">
         <p className="text-lg font-semibold mb-2">
           Назва: <span className="text-gray-700">{contract.title}</span>
         </p>
@@ -87,28 +88,31 @@ const ContractDetails = ({ auth }) => {
           Примітка:{" "}
           <span className="text-gray-700">{contract.description}</span>
         </p>
-        <button
-          className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded-2xl"
-          onClick={handleDownload}
-        >
-          Завантажити
-        </button>
-        {auth && (
-          <div>
-            <button
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl ml-2"
-              onClick={() => navigate(`/${org}/update/${id}`)}
-            >
-              Update
-            </button>
-            <button
-              className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-2xl"
-              onClick={deleteContract}
-            >
-              Видалити
-            </button>
-          </div>
-        )}
+
+        <div className="flex">
+          <button
+            className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded-2xl"
+            onClick={handleDownload}
+          >
+            Завантажити
+          </button>
+          {auth && (
+            <div className="flex gap-2">
+              <button
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-2xl ml-2"
+                onClick={() => navigate(`/${org}/update/${id}`)}
+              >
+                Update
+              </button>
+              <button
+                className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-2xl"
+                onClick={deleteContract}
+              >
+                Видалити
+              </button>
+            </div>
+          )}
+        </div>
       </div>
       <div className="flex flex-col justify-center align-middle h-[800px] w-[900px] flex-grow">
         <iframe
