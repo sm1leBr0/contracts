@@ -8,6 +8,22 @@ const createTables = async () => {
   password VARCHAR(100) NOT NULL
 );`);
 
+    await pool.query(`DROP TABLE IF EXISTS counterparty CASCADE`);
+    // Create counterparties table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS counterparty (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(100) NOT NULL UNIQUE
+      )
+    `);
+    await pool.query(`DROP TABLE IF EXISTS performers CASCADE`);
+    // Create performers table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS performers (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(100) NOT NULL UNIQUE
+      )
+    `);
     await pool.query(`DROP TABLE IF EXISTS protect`);
     // Create updated protect table
     await pool.query(`
@@ -45,22 +61,7 @@ const createTables = async () => {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
-    await pool.query(`DROP TABLE IF EXISTS counterparty CASCADE`);
-    // Create counterparties table
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS counterparty (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(100) NOT NULL UNIQUE
-      )
-    `);
-    await pool.query(`DROP TABLE IF EXISTS performers CASCADE`);
-    // Create performers table
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS performers (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(100) NOT NULL UNIQUE
-      )
-    `);
+
     console.log("Tables created successfully");
   } catch (err) {
     console.error("Error creating tables", err);

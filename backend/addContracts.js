@@ -40,9 +40,7 @@ const generateContractData = () => {
     end_date: faker.date.future().toISOString().split("T")[0],
     scope: faker.lorem.word(),
     performers: faker.name.findName(),
-    file: fs.createReadStream(
-      "C:/Users/bdemianenko/Downloads/_Example Contract Title.pdf"
-    ), // Adjust this to your actual file path if needed
+    file: fs.createReadStream("C:/Users/sm1le/Downloads/res.pdf"), // Adjust this to your actual file path if needed
   };
 };
 
