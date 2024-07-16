@@ -14,6 +14,7 @@ const ContractUploadForm = () => {
     file: null,
     counterparty: "",
     performers: "",
+    condition: "",
     organisation: "protect",
   });
 
@@ -47,6 +48,7 @@ const ContractUploadForm = () => {
     formDataToSubmit.append("title", formData.title);
     formDataToSubmit.append("number", formData.numberOfContract);
     formDataToSubmit.append("description", formData.description);
+    formDataToSubmit.append("condition", formData.condition);
     formDataToSubmit.append("date", formData.date);
     formDataToSubmit.append("end_date", formData.endDate);
     formDataToSubmit.append("scope", formData.scope || "");
@@ -74,6 +76,7 @@ const ContractUploadForm = () => {
         file: null,
         counterparty: "",
         performers: "",
+        condition: "",
         organisation: "protect",
       });
     } catch (error) {

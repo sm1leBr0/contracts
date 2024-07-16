@@ -60,36 +60,39 @@ const ContractDetails = ({ auth }) => {
   if (!contract) return <div>Loading...</div>;
 
   return (
-    <div className="max-w-7xl flex justify-between mx-auto h-full p-6">
-      <div className="max-w-xl p-6 mr-6">
-        <p className="text-lg font-semibold mb-2">
+    <div className="max-w-7xl flex justify-between mx-auto h-full p-6 bg-slate-50">
+      <div className="flex flex-col gap-3 max-w-xl p-6 mr-6 text-xl font-semibold mb-2 text-gray-900">
+        <p className="">
           Назва: <span className="text-gray-700">{contract.title}</span>
         </p>
-        <p className="text-lg font-semibold mb-2">
+        <p className="">
           Номер договору:{" "}
           <span className="text-gray-700">{contract.number}</span>
         </p>
-        <p className="text-lg font-semibold mb-2">
+        <p className="">
           Контрагент:{" "}
           <span className="text-gray-700">{contract.counterparty}</span>
         </p>
-        <p className="text-lg font-semibold mb-2">
+        <p className="">
           Виконавець:{" "}
           <span className="text-gray-700">{contract.performers}</span>
         </p>
-        <p className="text-lg font-semibold mb-2">
+        <p className="">
           Дата: <span className="text-gray-700">{contract.date}</span>
         </p>
-        <p className="text-lg font-semibold mb-2">
+        <p className="">
           Дата закінчення:{" "}
           <span className="text-gray-700">{contract.end_date}</span>
         </p>
-        <p className="text-lg font-semibold mb-4">
+        <p className="">
+          Стан: <span className="text-gray-700">{contract.condition}</span>
+        </p>
+        <p className="">
           Примітка:{" "}
           <span className="text-gray-700">{contract.description}</span>
         </p>
 
-        <div className="flex">
+        <div className="flex text-lg">
           <button
             className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded-2xl"
             onClick={handleDownload}

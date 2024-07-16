@@ -16,6 +16,7 @@ const Form = ({
     performers,
     date,
     endDate,
+    condition,
     organisation,
   } = formData;
 
@@ -30,11 +31,11 @@ const Form = ({
     <div className="w-[500px] mx-auto">
       <div className=" bg-gray-300 p-5 rounded-lg shadow-md">
         <h2 className="text-xl font-semibold mb-4 text-center">
-          {isUpdate ? "Update Contract" : "Upload Contract"}
+          {isUpdate ? "Редагувати контракт" : "Завантажити контракт"}
         </h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label htmlFor="title">Title</label>
+            <label htmlFor="title">Предмет</label>
             <input
               type="text"
               id="title"
@@ -46,7 +47,7 @@ const Form = ({
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="number">Contract Number</label>
+            <label htmlFor="number">№ Договору</label>
             <input
               type="number"
               id="number"
@@ -58,7 +59,7 @@ const Form = ({
             />
           </div>
           <div className="mb-2">
-            <label htmlFor="counterparty">Counterparty</label>
+            <label>Контрагент</label>
             <DropDownInput
               onSelect={(selected) =>
                 handleInputChange({
@@ -70,7 +71,7 @@ const Form = ({
             />
           </div>
           <div className="mb-2">
-            <label htmlFor="performers">Performers</label>
+            <label>Відповідальний за виконання</label>
             <DropDownInput
               onSelect={(selected) =>
                 handleInputChange({
@@ -82,7 +83,7 @@ const Form = ({
             />
           </div>
           <div className="mb-2">
-            <label htmlFor="date">Date</label>
+            <label htmlFor="date">Дата</label>
             <input
               type="date"
               id="date"
@@ -94,7 +95,7 @@ const Form = ({
             />
           </div>
           <div className="mb-2">
-            <label htmlFor="end_date">End Date</label>
+            <label htmlFor="end_date">Дата закінчення</label>
             <input
               type="date"
               id="end_date"
@@ -106,7 +107,19 @@ const Form = ({
             />
           </div>
           <div className="mb-2">
-            <label htmlFor="description">Description</label>
+            <label htmlFor="condition">Стан</label>
+            <input
+              type="text"
+              id="condition"
+              name="condition"
+              value={condition}
+              onChange={handleInputChange}
+              required
+              className="form-element"
+            />
+          </div>
+          <div className="mb-2">
+            <label htmlFor="description">Примітка</label>
             <textarea
               id="description"
               name="description"
@@ -116,36 +129,49 @@ const Form = ({
             ></textarea>
           </div>
           <div className="mb-2">
-            <label>Organisation</label>
-            <div>
-              <input
-                type="radio"
-                id="protect"
-                name="organisation"
-                value="protect"
-                checked={organisation === "protect"}
-                onChange={handleInputChange}
-                required
-                disabled={isUpdate}
-              />
-              <label htmlFor="protect">Protect</label>
-            </div>
-            <div>
-              <input
-                type="radio"
-                id="aig"
-                name="organisation"
-                value="aig"
-                checked={organisation === "aig"}
-                onChange={handleInputChange}
-                required
-                disabled={isUpdate}
-              />
-              <label htmlFor="aig">AIG</label>
-            </div>
+            <fieldset>
+              <legend className="mb-2 text-lg font-semibold">
+                Організація
+              </legend>
+              <div className="flex gap-4">
+                <div className="flex items-center">
+                  <input
+                    type="radio"
+                    id="protect"
+                    name="organisation"
+                    value="protect"
+                    checked={organisation === "protect"}
+                    onChange={handleInputChange}
+                    required
+                    disabled={isUpdate}
+                    className="form-radio"
+                  />
+                  <label htmlFor="protect" className="ml-2">
+                    Protect
+                  </label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    type="radio"
+                    id="aig"
+                    name="organisation"
+                    value="aig"
+                    checked={organisation === "aig"}
+                    onChange={handleInputChange}
+                    required
+                    disabled={isUpdate}
+                    className="form-radio"
+                  />
+                  <label htmlFor="aig" className="ml-2">
+                    AIG
+                  </label>
+                </div>
+              </div>
+            </fieldset>
           </div>
+
           <div className="mb-4">
-            <label htmlFor="file">File</label>
+            <label htmlFor="file">Файл</label>
             <input
               type="file"
               id="file"
@@ -156,9 +182,9 @@ const Form = ({
           </div>
           <button
             type="submit"
-            className="inline-block bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="inline-block justify-center bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            {isUpdate ? "Update Contract" : "Upload Contract"}
+            {isUpdate ? "Редагувати" : "Додати"}
           </button>
         </form>
       </div>

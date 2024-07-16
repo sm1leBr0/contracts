@@ -77,7 +77,7 @@ const ContractsList = ({ searchTerm, org }) => {
         <table className="table-fixed w-full text-gray-900">
           <thead className="text-left bg-gray-800 text-gray-100 cursor-pointer select-none sticky top-0 z-10">
             <tr>
-              <th className="p-2 w-[140px]" onClick={() => handleSort("title")}>
+              <th className="p-2 w-[100px]" onClick={() => handleSort("title")}>
                 <div className="flex items-center">
                   Назва {getSortIcon("title")}
                 </div>
@@ -86,7 +86,15 @@ const ContractsList = ({ searchTerm, org }) => {
                 <div className="flex items-center">ID {getSortIcon("id")}</div>
               </th>
               <th
-                className="p-2  w-[120px]"
+                className="p-2  w-[80px]"
+                onClick={() => handleSort("number")}
+              >
+                <div className="flex items-center">
+                  Номер {getSortIcon("number")}
+                </div>
+              </th>
+              <th
+                className="p-2  w-[100px]"
                 onClick={() => handleSort("counterparty")}
               >
                 <div className="flex items-center">
@@ -94,11 +102,11 @@ const ContractsList = ({ searchTerm, org }) => {
                 </div>
               </th>
               <th
-                className="p-2  w-[80px]"
-                onClick={() => handleSort("number")}
+                className="p-2  w-[100px]"
+                onClick={() => handleSort("performers")}
               >
                 <div className="flex items-center">
-                  Номер {getSortIcon("number")}
+                  Відповідальний за виконання {getSortIcon("performers")}
                 </div>
               </th>
               <th className="p-2  w-[100px]" onClick={() => handleSort("date")}>
@@ -115,11 +123,11 @@ const ContractsList = ({ searchTerm, org }) => {
                 </div>
               </th>
               <th
-                className="p-2  w-[120px]"
-                onClick={() => handleSort("performers")}
+                className="p-2  w-[60px]"
+                onClick={() => handleSort("condition")}
               >
                 <div className="flex items-center">
-                  Виконавець {getSortIcon("performers")}
+                  Стан {getSortIcon("condition")}
                 </div>
               </th>
               <th
@@ -138,11 +146,12 @@ const ContractsList = ({ searchTerm, org }) => {
               <tr key={item.id} className="hover:bg-gray-200">
                 <td className="p-2">{item.title}</td>
                 <td className="p-2">{item.id}</td>
-                <td className="p-2">{item.counterparty}</td>
                 <td className="p-2">{item.number}</td>
+                <td className="p-2">{item.counterparty}</td>
+                <td className="p-2">{item.performers}</td>
                 <td className="p-2">{item.date}</td>
                 <td className="p-2">{item.end_date}</td>
-                <td className="p-2">{item.performers}</td>
+                <td className="p-2">{item.condition}</td>
                 <td className="p-2">
                   {item.description.toString().slice(0, 10) + "..."}
                 </td>

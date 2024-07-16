@@ -17,6 +17,7 @@ const UpdateContractForm = () => {
     file: null,
     counterparty: "",
     performers: "",
+    condition: "",
     organisation: org,
   });
 
@@ -31,8 +32,9 @@ const UpdateContractForm = () => {
           date: contract.date,
           endDate: contract.end_date,
           description: contract.description,
-          counterparty: contract.counterparty,
-          performers: contract.performers,
+          counterparty: contract.counterparty || "",
+          performers: contract.performers || "",
+          condition: contract.condition || "",
           organisation: org,
         });
       } catch (error) {
@@ -74,6 +76,7 @@ const UpdateContractForm = () => {
     formDataToSubmit.append("title", formData.title);
     formDataToSubmit.append("number", formData.numberOfContract);
     formDataToSubmit.append("description", formData.description);
+    formDataToSubmit.append("condition", formData.condition);
     formDataToSubmit.append("date", formData.date);
     formDataToSubmit.append("end_date", formData.endDate);
     formDataToSubmit.append("counterparty", formData.counterparty);

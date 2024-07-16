@@ -62,7 +62,7 @@ function App() {
             type="text"
             value={searchTerm}
             onChange={(e) => handleSearchChange(e)}
-            placeholder="Search"
+            placeholder="Шукати"
             className="border p-2 rounded-lg"
           />
         </div>

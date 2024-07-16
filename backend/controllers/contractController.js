@@ -117,7 +117,7 @@ exports.addContract = async (req, res) => {
     number,
     date,
     end_date,
-    scope,
+    condition,
     performers,
   } = req.body;
   const file_path = req.file.path;
@@ -127,7 +127,7 @@ exports.addContract = async (req, res) => {
     const performer_id = await getOrInsertPerformer(performers);
 
     const newContract = await pool.query(
-      `INSERT INTO ${table} (title, description, counterparty_id, number, date, end_date, scope, performer_id, file_path) 
+      `INSERT INTO ${table} (title, description, counterparty_id, number, date, end_date, condition, performer_id, file_path) 
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
       [
         title,
@@ -136,7 +136,7 @@ exports.addContract = async (req, res) => {
         number,
         date,
         end_date,
-        scope,
+        condition,
         performer_id,
         file_path,
       ]
@@ -165,7 +165,7 @@ exports.getContracts = async (req, res) => {
         ${table}.number, 
         TO_CHAR(${table}.date, 'YYYY-MM-DD') AS date, 
         TO_CHAR(${table}.end_date, 'YYYY-MM-DD') AS end_date,
-        ${table}.scope, 
+        ${table}.condition, 
         performers.name AS performers, 
         ${table}.file_path, 
         TO_CHAR(${table}.created_at, 'YYYY-MM-DD') AS created_at 
@@ -183,7 +183,7 @@ exports.getContracts = async (req, res) => {
               ${table}.number ILIKE $1 OR 
               TO_CHAR(${table}.date, 'YYYY-MM-DD') ILIKE $1 OR 
               TO_CHAR(${table}.end_date, 'YYYY-MM-DD') ILIKE $1 OR 
-              ${table}.scope ILIKE $1 OR 
+              ${table}.condition ILIKE $1 OR 
               performers.name ILIKE $1
       `;
       values.push(`%${search}%`);
@@ -214,7 +214,7 @@ exports.getContractById = async (req, res) => {
          ${table}.number, 
          TO_CHAR(${table}.date, 'YYYY-MM-DD') AS date, 
          TO_CHAR(${table}.end_date, 'YYYY-MM-DD') AS end_date,
-         ${table}.scope, 
+         ${table}.condition, 
          performers.name AS performers, 
          ${table}.file_path, 
          TO_CHAR(${table}.created_at, 'YYYY.MM.DD') AS created_at 
@@ -292,7 +292,7 @@ exports.updateContract = async (req, res) => {
     number,
     date,
     end_date,
-    scope,
+    condition,
     performers,
   } = req.body;
 
@@ -326,9 +326,9 @@ exports.updateContract = async (req, res) => {
     fieldsToUpdate.end_date = end_date;
     updateParams.push(end_date);
   }
-  if (scope !== undefined) {
-    fieldsToUpdate.scope = scope;
-    updateParams.push(scope);
+  if (condition !== undefined) {
+    fieldsToUpdate.condition = condition;
+    updateParams.push(condition);
   }
   if (performers !== undefined) {
     const performer_id = await getOrInsertPerformer(performers);

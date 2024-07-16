@@ -35,7 +35,7 @@ const createTables = async () => {
         number VARCHAR(50) NOT NULL,
         date DATE,
         end_date DATE,
-        scope TEXT,
+        condition TEXT,
         performer_id INTEGER REFERENCES performers(id),
         file_path VARCHAR(255) NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -55,7 +55,7 @@ const createTables = async () => {
         number VARCHAR(50) NOT NULL,
         date DATE,
         end_date DATE,
-        scope TEXT,
+        condition TEXT,
         performer_id INTEGER REFERENCES performers(id),
         file_path VARCHAR(255) NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
