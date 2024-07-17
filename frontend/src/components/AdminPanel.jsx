@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DropDownInput from "./DropDownInput";
 import ContractUploadForm from "./ContractUploadForm";
 import axios from "axios";
@@ -9,7 +9,24 @@ const AdminPanel = ({ setAuth }) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [itemType, setItemType] = useState("");
   const [message, setMessage] = useState("");
+  const [users, setUsers] = useState([]);
+  const [newUsername, setNewUsername] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await axiosInstance.get(
+          "http://127.0.0.1:5000/api/users"
+        );
+        setUsers(response.data);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      }
+    };
+    fetchUsers();
+  }, [message]);
 
   const handleSelect = (item, type) => {
     setSelectedItem(item);
@@ -59,15 +76,42 @@ const AdminPanel = ({ setAuth }) => {
       setTimeout(() => setMessage(""), 3000);
     }
   };
+  const handleAddUser = async () => {
+    try {
+      await axiosInstance.post("http://127.0.0.1:5000/api/users/add", {
+        username: newUsername,
+        password: newPassword,
+      });
+      setNewUsername("");
+      setNewPassword("");
+      setMessage("User added successfully!");
+    } catch (error) {
+      console.error("Error adding user:", error);
+      setMessage("Error adding user. Please try again.");
+    } finally {
+      setTimeout(() => setMessage(""), 3000);
+    }
+  };
+
+  const handleDeleteUser = async (id) => {
+    try {
+      await axiosInstance.delete(`http://127.0.0.1:5000/api/users/${id}`);
+      setMessage("User deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      setMessage("Error deleting user. Please try again.");
+    } finally {
+      setTimeout(() => setMessage(""), 3000);
+    }
+  };
 
   return (
-    <div className="mx-auto flex gap-2">
+    <div className="container mx-auto p-4 space-y-6 flex">
       <ContractUploadForm />
-      <div className="flex flex-col">
-        {" "}
-        <div className="flex flex-col w-[400px] h-[200px] rounded-lg bg-gray-300 p-2 shadow-lg gap-2 items-center">
-          <h2>Select Performer</h2>
-          <div className="flex gap-2">
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col  bg-gray-100 p-4 rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold mb-4">Select Performer</h2>
+          <div className="flex flex-col gap-4 mb-4">
             <DropDownInput
               onSelect={(item) => handleSelect(item, "performer")}
               type="performer"
@@ -77,21 +121,23 @@ const AdminPanel = ({ setAuth }) => {
                   : ""
               }
             />
-            <button
-              className="bg-green-800 rounded-xl shadow-xl px-4 py-2 text-white"
-              onClick={() => handleAdd("performer", selectedItem.name)}
-            >
-              Add
-            </button>
-            <button
-              className="bg-red-800 rounded-xl shadow-xl px-4 py-2 text-white"
-              onClick={handleDelete}
-            >
-              Delete
-            </button>
+            <div className="flex gap-2">
+              <button
+                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md shadow-md transition"
+                onClick={() => handleAdd("performer", selectedItem?.name || "")}
+              >
+                Add
+              </button>
+              <button
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md shadow-md transition"
+                onClick={handleDelete}
+              >
+                Delete
+              </button>
+            </div>
           </div>
-          <h2>Select Counterparty</h2>
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-4">
+            <h2 className="text-xl font-semibold mb-4">Select Counterparty</h2>
             <DropDownInput
               onSelect={(item) => handleSelect(item, "counterparty")}
               type="counterparty"
@@ -101,22 +147,26 @@ const AdminPanel = ({ setAuth }) => {
                   : ""
               }
             />
-            <button
-              className="bg-green-800 rounded-xl shadow-xl px-4 py-2 text-white"
-              onClick={() => handleAdd("counterparty", selectedItem.name)}
-            >
-              Add
-            </button>
-            <button
-              className="bg-red-800 rounded-xl shadow-xl px-4 py-2 text-white"
-              onClick={handleDelete}
-            >
-              Delete
-            </button>
+            <div className="flex gap-2">
+              <button
+                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md shadow-md transition"
+                onClick={() =>
+                  handleAdd("counterparty", selectedItem?.name || "")
+                }
+              >
+                Add
+              </button>
+              <button
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md shadow-md transition"
+                onClick={handleDelete}
+              >
+                Delete
+              </button>
+            </div>
           </div>
           {message && (
             <span
-              className={`mt-2 ${
+              className={`mt-4 block ${
                 message.includes("Error") ? "text-red-600" : "text-green-600"
               }`}
             >
@@ -124,7 +174,51 @@ const AdminPanel = ({ setAuth }) => {
             </span>
           )}
         </div>
-        <button className="bg-red-950 text-white p-4" onClick={handleLogout}>
+        <div className="flex flex-col flex-1 bg-gray-100 p-4 rounded-lg shadow-md">
+          <h2 className="text-xl font-semibold mb-4">User Management</h2>
+          <div className="mb-4">
+            <input
+              type="text"
+              placeholder="Username"
+              value={newUsername}
+              onChange={(e) => setNewUsername(e.target.value)}
+              className="border p-2 rounded-lg w-full mb-2"
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              className="border p-2 rounded-lg w-full mb-4"
+            />
+            <button
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md shadow-md transition"
+              onClick={handleAddUser}
+            >
+              Add User
+            </button>
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Existing Users:</h3>
+            <ul className="space-y-2">
+              {users.map((user) => (
+                <li key={user.id} className="flex justify-between items-center">
+                  <span>{user.username}</span>
+                  <button
+                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md shadow-md transition"
+                    onClick={() => handleDeleteUser(user.id)}
+                  >
+                    Delete
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>{" "}
+        <button
+          className="bg-red-800 hover:bg-red-900 text-white p-4 rounded-md shadow-md transition"
+          onClick={handleLogout}
+        >
           Logout
         </button>
       </div>

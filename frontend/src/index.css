@@ -41,3 +41,28 @@
 .table-container::-webkit-scrollbar-thumb:hover {
   background-color: #6b7280;
 }
+.container {
+  max-width: 1200px;
+}
+
+/* Button hover states */
+.bg-green-600:hover {
+  background-color: #4caf50;
+}
+
+.bg-red-600:hover {
+  background-color: #f44336;
+}
+
+.bg-blue-600:hover {
+  background-color: #2196f3;
+}
+
+.bg-red-800:hover {
+  background-color: #c62828;
+}
+
+/* Button styles */
+button {
+  cursor: pointer;
+}
