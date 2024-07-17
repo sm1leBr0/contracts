@@ -26,8 +26,6 @@ const DropDownInput = ({ onSelect, type, defaultValue = "" }) => {
         );
         const data = Array.isArray(response.data) ? response.data : [];
         setSuggestions(data);
-        // Open the dropdown if there are suggestions
-        setIsDropdownOpen(false);
       } catch (error) {
         console.error("Error fetching suggestions:", error);
         setSuggestions([]);
@@ -76,12 +74,14 @@ const DropDownInput = ({ onSelect, type, defaultValue = "" }) => {
 
   // Handle custom input when the input field loses focus
   const handleBlur = () => {
-    if (query && !suggestions.some((s) => s.name === query)) {
-      const customSuggestion = { id: query, name: query };
-      onSelect(customSuggestion);
+    // Do nothing if there are suggestions
+    if (suggestions.length === 0) {
+      if (query && !suggestions.some((s) => s.name === query)) {
+        const customSuggestion = { id: query, name: query };
+        handleSelect(customSuggestion); // Use handleSelect to handle custom input
+      }
     }
   };
-
   return (
     <div className="relative autocomplete-container" ref={containerRef}>
       <input

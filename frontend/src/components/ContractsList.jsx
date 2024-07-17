@@ -5,7 +5,7 @@ import { TiArrowSortedUp, TiArrowSortedDown } from "react-icons/ti";
 
 const ContractsList = ({ searchTerm, org }) => {
   const [data, setData] = useState([]);
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+  const [sortConfig, setSortConfig] = useState({ key: "id", direction: "asc" });
 
   useEffect(() => {
     const fetchContracts = async (query) => {
@@ -35,12 +35,26 @@ const ContractsList = ({ searchTerm, org }) => {
   };
 
   const sortedData = [...data].sort((a, b) => {
-    if (a[sortConfig.key] < b[sortConfig.key]) {
-      return sortConfig.direction === "asc" ? -1 : 1;
+    const aValue = a[sortConfig.key];
+    const bValue = b[sortConfig.key];
+
+    if (aValue === null || aValue === undefined) return 1;
+    if (bValue === null || bValue === undefined) return -1;
+
+    if (typeof aValue === "string" && typeof bValue === "string") {
+      return sortConfig.direction === "asc"
+        ? aValue.localeCompare(bValue)
+        : bValue.localeCompare(aValue);
     }
-    if (a[sortConfig.key] > b[sortConfig.key]) {
-      return sortConfig.direction === "asc" ? 1 : -1;
+
+    if (typeof aValue === "number" && typeof bValue === "number") {
+      return sortConfig.direction === "asc" ? aValue - bValue : bValue - aValue;
     }
+
+    if (aValue instanceof Date && bValue instanceof Date) {
+      return sortConfig.direction === "asc" ? aValue - bValue : bValue - aValue;
+    }
+
     return 0;
   });
 
@@ -79,7 +93,7 @@ const ContractsList = ({ searchTerm, org }) => {
             <tr>
               <th className="p-2 w-[100px]" onClick={() => handleSort("title")}>
                 <div className="flex items-center">
-                  Назва {getSortIcon("title")}
+                  Предмет договору {getSortIcon("title")}
                 </div>
               </th>
               <th className="p-2 w-[40px]" onClick={() => handleSort("id")}>

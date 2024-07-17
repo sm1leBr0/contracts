@@ -3,7 +3,6 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const path = require("path");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
 
 const contractRoutes = require("./routes/contractRoutes");
 const userRoutes = require("./routes/userRoutes");
@@ -16,7 +15,7 @@ app.use(express.json());
 
 const adminUsername = process.env.ST_ADMIN;
 const adminPassword = process.env.ST_PASS;
-app.post("/api/admin/login", (req, res) => {
+app.post("/api/login", (req, res) => {
   const { username, password } = req.body;
 
   if (username === adminUsername && password === adminPassword) {

@@ -88,7 +88,7 @@ function App() {
           <Route
             path="/admin"
             element={
-              auth ? <AdminPanel auth={auth} /> : <Navigate to="/login" />
+              auth ? <AdminPanel setAuth={setAuth} /> : <Navigate to="/login" />
             }
           />
           <Route path="/:org/:id" element={<ContractDetails auth={auth} />} />

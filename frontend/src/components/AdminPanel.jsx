@@ -3,15 +3,23 @@ import DropDownInput from "./DropDownInput";
 import ContractUploadForm from "./ContractUploadForm";
 import axios from "axios";
 import axiosInstance from "../axiosInstance";
+import { useNavigate } from "react-router-dom";
 
-const AdminPanel = ({ auth }) => {
+const AdminPanel = ({ setAuth }) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [itemType, setItemType] = useState("");
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
   const handleSelect = (item, type) => {
     setSelectedItem(item);
     setItemType(type);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("authToken");
+    setAuth(null); // Clear auth state
+    navigate("/login");
   };
 
   const handleDelete = async () => {
@@ -55,62 +63,70 @@ const AdminPanel = ({ auth }) => {
   return (
     <div className="mx-auto flex gap-2">
       <ContractUploadForm />
-      <div className="flex flex-col w-[400px] h-[200px] rounded-lg bg-gray-300 p-2 shadow-lg gap-2 items-center">
-        <h2>Select Performer</h2>
-        <div className="flex gap-2">
-          <DropDownInput
-            onSelect={(item) => handleSelect(item, "performer")}
-            type="performer"
-            defaultValue={
-              selectedItem && itemType === "performer" ? selectedItem.name : ""
-            }
-          />
-          <button
-            className="bg-green-800 rounded-xl shadow-xl px-4 py-2 text-white"
-            onClick={() => handleAdd("performer", selectedItem.name)}
-          >
-            Add
-          </button>
-          <button
-            className="bg-red-800 rounded-xl shadow-xl px-4 py-2 text-white"
-            onClick={handleDelete}
-          >
-            Delete
-          </button>
+      <div className="flex flex-col">
+        {" "}
+        <div className="flex flex-col w-[400px] h-[200px] rounded-lg bg-gray-300 p-2 shadow-lg gap-2 items-center">
+          <h2>Select Performer</h2>
+          <div className="flex gap-2">
+            <DropDownInput
+              onSelect={(item) => handleSelect(item, "performer")}
+              type="performer"
+              defaultValue={
+                selectedItem && itemType === "performer"
+                  ? selectedItem.name
+                  : ""
+              }
+            />
+            <button
+              className="bg-green-800 rounded-xl shadow-xl px-4 py-2 text-white"
+              onClick={() => handleAdd("performer", selectedItem.name)}
+            >
+              Add
+            </button>
+            <button
+              className="bg-red-800 rounded-xl shadow-xl px-4 py-2 text-white"
+              onClick={handleDelete}
+            >
+              Delete
+            </button>
+          </div>
+          <h2>Select Counterparty</h2>
+          <div className="flex gap-2">
+            <DropDownInput
+              onSelect={(item) => handleSelect(item, "counterparty")}
+              type="counterparty"
+              defaultValue={
+                selectedItem && itemType === "counterparty"
+                  ? selectedItem.name
+                  : ""
+              }
+            />
+            <button
+              className="bg-green-800 rounded-xl shadow-xl px-4 py-2 text-white"
+              onClick={() => handleAdd("counterparty", selectedItem.name)}
+            >
+              Add
+            </button>
+            <button
+              className="bg-red-800 rounded-xl shadow-xl px-4 py-2 text-white"
+              onClick={handleDelete}
+            >
+              Delete
+            </button>
+          </div>
+          {message && (
+            <span
+              className={`mt-2 ${
+                message.includes("Error") ? "text-red-600" : "text-green-600"
+              }`}
+            >
+              {message}
+            </span>
+          )}
         </div>
-        <h2>Select Counterparty</h2>
-        <div className="flex gap-2">
-          <DropDownInput
-            onSelect={(item) => handleSelect(item, "counterparty")}
-            type="counterparty"
-            defaultValue={
-              selectedItem && itemType === "counterparty"
-                ? selectedItem.name
-                : ""
-            }
-          />
-          <button
-            className="bg-green-800 rounded-xl shadow-xl px-4 py-2 text-white"
-            onClick={() => handleAdd("counterparty", selectedItem.name)}
-          >
-            Add
-          </button>
-          <button
-            className="bg-red-800 rounded-xl shadow-xl px-4 py-2 text-white"
-            onClick={handleDelete}
-          >
-            Delete
-          </button>
-        </div>
-        {message && (
-          <span
-            className={`mt-2 ${
-              message.includes("Error") ? "text-red-600" : "text-green-600"
-            }`}
-          >
-            {message}
-          </span>
-        )}
+        <button className="bg-red-950 text-white p-4" onClick={handleLogout}>
+          Logout
+        </button>
       </div>
     </div>
   );

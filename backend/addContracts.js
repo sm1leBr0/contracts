@@ -8,7 +8,7 @@ const tables = ["protect", "aig"]; // Add your actual table names here
 
 const fetchToken = async () => {
   try {
-    const response = await axios.post("http://127.0.0.1:5000/api/admin/login", {
+    const response = await axios.post("http://127.0.0.1:5000/api/login", {
       username: "admin", // Replace with actual username
       password: "pass", // Replace with actual password
     });

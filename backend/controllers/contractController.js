@@ -389,33 +389,62 @@ exports.updateContract = async (req, res) => {
 
 exports.deletePerformer = async (req, res) => {
   const { id } = req.params;
+  console.log(`Attempting to delete performer with ID: ${id}`);
   try {
+    // Set performer_id to NULL in protect and aig tables
+    await pool.query(
+      "UPDATE protect SET performer_id = NULL WHERE performer_id = $1",
+      [id]
+    );
+    await pool.query(
+      "UPDATE aig SET performer_id = NULL WHERE performer_id = $1",
+      [id]
+    );
+
+    // Delete performer
     const result = await pool.query(
       "DELETE FROM performers WHERE id = $1 RETURNING *",
       [id]
     );
     if (result.rows.length === 0) {
+      console.log(`Performer with ID: ${id} not found.`);
       return res.status(404).json({ error: "Performer not found" });
     }
+    console.log(`Performer with ID: ${id} deleted successfully.`);
     res.status(200).json({ message: "Performer deleted successfully" });
   } catch (error) {
+    console.error("Error deleting performer:", error);
     res.status(500).json({ error: error.message });
   }
 };
-
 // Function to delete a counterparty by ID
 exports.deleteCounterparty = async (req, res) => {
   const { id } = req.params;
+  console.log(`Attempting to delete counterparty with ID: ${id}`);
   try {
+    // Set counterparty_id to NULL in protect and aig tables
+    await pool.query(
+      "UPDATE protect SET counterparty_id = NULL WHERE counterparty_id = $1",
+      [id]
+    );
+    await pool.query(
+      "UPDATE aig SET counterparty_id = NULL WHERE counterparty_id = $1",
+      [id]
+    );
+
+    // Delete counterparty
     const result = await pool.query(
       "DELETE FROM counterparty WHERE id = $1 RETURNING *",
       [id]
     );
     if (result.rows.length === 0) {
+      console.log(`Counterparty with ID: ${id} not found.`);
       return res.status(404).json({ error: "Counterparty not found" });
     }
+    console.log(`Counterparty with ID: ${id} deleted successfully.`);
     res.status(200).json({ message: "Counterparty deleted successfully" });
   } catch (error) {
+    console.error("Error deleting counterparty:", error);
     res.status(500).json({ error: error.message });
   }
 };

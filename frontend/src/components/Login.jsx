@@ -11,18 +11,15 @@ const Login = ({ setAuth }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/admin/login",
-        {
-          username,
-          password,
-        }
-      );
+      const response = await axios.post("http://localhost:5000/api/login", {
+        username,
+        password,
+      });
       localStorage.setItem("authToken", response.data.token);
-      setAuth(response.data.token);
-      navigate("/");
+      setAuth(response.data.token); // Update auth state in App component
+      navigate("/"); // Redirect to home page after successful login
     } catch (err) {
-      setError("Invalid credentials");
+      setError("Invalid credentials"); // Set error message for invalid credentials
     }
   };
 
